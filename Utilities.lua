@@ -47,10 +47,26 @@ function S.Utils.GetContainerNumSlots(containerID)
 end
 S.Utils.GetContainerNumFreeSlots = GetContainerNumFreeSlots
 
--- S.WoWVersion() returns the major WoW version number, Classic: 1, TBC: 2, WotlK: 3, etc...
-local WoWMajorVersionNumber = tonumber(string.sub(GetBuildInfo(), 1, 2))
+local versionString = GetBuildInfo()
+local WoWMajorVersionNumber, WoWMinorVersionNumber, WoWPatchVersionNumber = string.match(versionString, "^(%d+)%.(%d+)%.(%d+)$")
+-- S.WoWVersion() returns the major WoW version number (Major.y.z), Classic: 1, TBC: 2, WotlK: 3, etc...
 function S.WoWVersion()
-    return WoWMajorVersionNumber
+    return WoWMajorVersionNumber and tonumber(WoWMajorVersionNumber) or 0
+end
+
+-- S.WoWVersionMinor() returns the minor WoW version number (x.Minor.z)
+function S.WoWVersionMinor()
+    return WoWMinorVersionNumber and tonumber(WoWMinorVersionNumber) or 0
+end
+
+-- S.WoWVersionpatch() returns the patch WoW version number (x.y.Patch)
+function S.WoWVersionPatch()
+    return WoWPatchVersionNumber and tonumber(WoWPatchVersionNumber) or 0
+end
+
+-- Returns true if the new bank system is used, which is the case in WoW 11.2 and later
+function S.Utils.NewBankSystem()
+    return S.WoWVersion() >= 11 or (S.WoWVersion() == 11 and S.WoWVersionMinor() >= 2)
 end
 
 -- Returns the number of bags that can be equipped
@@ -74,6 +90,11 @@ local MAX_BAG_SLOTS = 36
 function S.Utils.MaxBagSlots()
     return MAX_BAG_SLOTS
 end
+
+function S.Utils.MaxBankSlots()
+    return S.Utils.NewBankSystem() and 98 or MAX_BAG_SLOTS
+end
+
 
 
 -- Dealing with other bag frames
@@ -909,11 +930,12 @@ if S.WoWVersion() >= 10 then
         table.insert(containersOfType[S.CONTAINER_TYPES.ALL], i) 
         containersOfType["CONTAINER"..i] = { i }
     end
-
-    for i = NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS  + 1, NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS + NUM_BANKBAGSLOTS do 
-        table.insert(containersOfType[S.CONTAINER_TYPES.BANK], i) 
-        table.insert(containersOfType[S.CONTAINER_TYPES.ALL], i) 
-        containersOfType["CONTAINER"..i] = { i }
+    if not S.Utils.NewBankSystem() then
+        for i = NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS  + 1, NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS + NUM_BANKBAGSLOTS do 
+            table.insert(containersOfType[S.CONTAINER_TYPES.BANK], i) 
+            table.insert(containersOfType[S.CONTAINER_TYPES.ALL], i) 
+            containersOfType["CONTAINER"..i] = { i }
+        end
     end
 
 else
@@ -926,16 +948,29 @@ end
 -- Include account bank post-TWW
 if S.WoWVersion() >= 11 then
     containersOfType[S.CONTAINER_TYPES.ACCOUNT] = {}
-    for i = 13, 17 do
-        table.insert(containersOfType[S.CONTAINER_TYPES.ACCOUNT], i)
-        table.insert(containersOfType[S.CONTAINER_TYPES.ALL], i)
+    if S.Utils.NewBankSystem() then
+        for i = 6, 11 do
+            table.insert(containersOfType[S.CONTAINER_TYPES.BANK], i)
+            table.insert(containersOfType[S.CONTAINER_TYPES.ALL], i)
+            containersOfType["CONTAINER"..i] = { i }
+        end
+        for i = 12, 16 do
+            table.insert(containersOfType[S.CONTAINER_TYPES.ACCOUNT], i)
+            table.insert(containersOfType[S.CONTAINER_TYPES.ALL], i)
+        end
+    else
+        -- Account bank containers in TWW are 13-17
+        for i = 13, 17 do
+            table.insert(containersOfType[S.CONTAINER_TYPES.ACCOUNT], i)
+            table.insert(containersOfType[S.CONTAINER_TYPES.ALL], i)
+        end
     end
 end
 
 if S.WoWVersion() <= 3 then
     containersOfType[S.CONTAINER_TYPES.KEYRING] = { KEYRING_CONTAINER }
     table.insert(containersOfType[S.CONTAINER_TYPES.ALL], KEYRING_CONTAINER)
-elseif S.WoWVersion() >= 6 then
+elseif S.WoWVersion() >= 6 and not S.Utils.NewBankSystem() then
     containersOfType[S.CONTAINER_TYPES.REAGENT] = { REAGENTBANK_CONTAINER }
     table.insert(containersOfType[S.CONTAINER_TYPES.ALL], REAGENTBANK_CONTAINER)
 end
@@ -946,20 +981,29 @@ end
 
 
 
-local containerTypes = {
-    [BANK_CONTAINER] = "BANK",
-    [BACKPACK_CONTAINER] = "BAGS"
-}
+local containerTypes = {}
+if not S.Utils.NewBankSystem() then
+    containerTypes = {
+        [BANK_CONTAINER] = "BANK",
+        [BACKPACK_CONTAINER] = "BAGS"
+    }
+else
+    containerTypes = {
+        [BACKPACK_CONTAINER] = "BAGS"
+    }
+end
 if S.WoWVersion() >= 10 then
-    for i = 1, NUM_BAG_SLOTS do 
+    for i = 1, NUM_BAG_SLOTS do
         containerTypes[i] = "BAGS"
     end
     for i = NUM_BAG_SLOTS + 1, NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS do 
         containerTypes[i] = "BAGS"
         --containerTypes[i] = "REAGENT_BAGS"
     end
-    for i = NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS  + 1, NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS + NUM_BANKBAGSLOTS do 
-        containerTypes[i] = "BANK"
+    if not S.Utils.NewBankSystem() then
+        for i = NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS  + 1, NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS + NUM_BANKBAGSLOTS do
+            containerTypes[i] = "BANK"
+        end
     end
 else
     for i = 1, NUM_BAG_SLOTS do 
@@ -970,13 +1014,22 @@ else
     end
 end
 if S.WoWVersion() >= 11 then
-    for i = 13, 17 do
-        containerTypes[i] = "ACCOUNT"
+    if S.Utils.NewBankSystem() then
+        for i = 6, 11 do
+            containerTypes[i] = "BANK"
+        end
+        for i = 12, 16 do
+            containerTypes[i] = "ACCOUNT"
+        end
+    else
+        for i = 13, 17 do
+            containerTypes[i] = "ACCOUNT"
+        end
     end
 end
 if S.WoWVersion() < 4 then
     containerTypes[KEYRING_CONTAINER] = "KEYRING"
-elseif S.WoWVersion() >= 6 then
+elseif S.WoWVersion() >= 6 and not S.Utils.NewBankSystem() then
     containerTypes[REAGENTBANK_CONTAINER] = "REAGENT"
 end
 function S.Utils.GetContainerType(container)
@@ -992,7 +1045,10 @@ function S.Utils.GetContainerMaxSlots(container)
     elseif container == BANK_CONTAINER then
         return 28
      -- Account bank
-    elseif container >= 13 and container <= 17 then
+    elseif not S.Utils.NewBankSystem() and container >= 13 and container <= 17 then
+        return 98
+    -- Bank + Account bank
+    elseif container >= 6 and container <= 16 then
         return 98
     else
         return S.Utils.MaxBagSlots()

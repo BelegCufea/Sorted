@@ -1,15 +1,15 @@
 local _, S = ...
 local pairs, ipairs, string, type, time = pairs, ipairs, string, type, time
 
-if S.WoWVersion() >= 11 then
-    local bankType = Enum.BankType.Account
-    local maxBankSlots = 5
-    local containerIDoffset = S.Utils.NewBankSystem() and 11 or 12
+if S.Utils.NewBankSystem() then
+    local bankType = Enum.BankType.Character
+    local maxBankSlots = 6
+    local containerIDoffset = 5
     -- Side tab
-    local sideTab, f = S.AddSideTab(REPUTATION_SORT_TYPE_ACCOUNT, "WARBANK")
+    local sideTab, f = S.AddSideTab(S.Localize("TAB_BANK"), "BANK")
 
     -- Item list
-    f.itemList = S.CreateItemList(f, "ACCOUNT", 500, "ContainerFrameItemButtonTemplate")
+    f.itemList = S.CreateItemList(f, "BANK", 500, "ContainerFrameItemButtonTemplate")
     table.insert(S.itemLists, f.itemList)
     function f:GetMinWidth()
         return self.itemList:GetMinWidth()
@@ -20,7 +20,7 @@ if S.WoWVersion() >= 11 then
     f.tabsFrame:SetPoint("LEFT", f.itemList.freeSpace, "RIGHT")
     f.tabsFrame:SetSize(32, 32)
 
-    function S.GetAccountBankSelectedTab()
+    function S.GetBankSelectedTab()
         return f.selectedTab
     end
 
@@ -34,25 +34,13 @@ if S.WoWVersion() >= 11 then
     S.Utils.RunOnEvent(f.tabsSettingsMenu, "BankClosed", f.tabsSettingsMenu.Hide)
 
     -- Override blizz functions
-    if S.Utils.NewBankSystem() then
-        function f.tabsSettingsMenu.GetBankPanel()
-        return {
-            GetTabData = function(tabID)
-                return Sorted_AccountData.bankTabData[f.selectedTabSettings]
-            end
-        }
+    f.selectedTabSettings = 1
+    function f.tabsSettingsMenu.GetBankPanel()
+      return {
+        GetTabData = function(tabID)
+            return Sorted_Data[UnitGUID("player")].bankTabData[f.selectedTabSettings]
         end
-    else
-        function f.tabsSettingsMenu:GetSelectedTabData()
-            return Sorted_AccountData.bankTabData[f.selectedTabSettings]
-        end
-        function f.tabsSettingsMenu:GetBankFrame()
-            return f
-        end
-        f.selectedTabSettings = 1
-        function f:GetTabData(selectedTabID)
-            return Sorted_AccountData.bankTabData[f.selectedTabSettings]
-        end
+      }
     end
 
     f.tabs = {}
@@ -61,7 +49,7 @@ if S.WoWVersion() >= 11 then
         f.tabs[i].tabID = i
         f.tabs[i]:SetPoint("LEFT", (i - 1) * 32, 0)
         f.tabs[i]:SetScript("OnEnter", function(self)
-            local tabData = Sorted_AccountData.bankTabData[self.tabID]
+            local tabData = Sorted_Data[UnitGUID("player")].bankTabData[self.tabID]
             S.Tooltip.Schedule(function()
                 GameTooltip:SetOwner(self, "ANCHOR_TOP")
                 GameTooltip:ClearLines()
@@ -72,7 +60,7 @@ if S.WoWVersion() >= 11 then
                 elseif FlagsUtil.IsSet(tabData.depositFlags, Enum.BagSlotFlags.ExpansionLegacy) then
                     GameTooltip:AddLine(BANK_TAB_EXPANSION_ASSIGNMENT:format(BANK_TAB_EXPANSION_FILTER_LEGACY))
                 end
-                
+
                 local filterList = ContainerFrameUtil_ConvertFilterFlagsToList(tabData.depositFlags)
                 if filterList then
                     local wrapText = true;
@@ -97,7 +85,6 @@ if S.WoWVersion() >= 11 then
                         self:SetChecked(false)
                         f.tabsSettingsMenu:Hide()
                     else
-                        (AccountBankPanel or BankPanel):SelectTab(self.tabID + containerIDoffset)
                         f.selectedTabSettings = self.tabID
                         if not f.tabsSettingsMenu:IsShown() then
                             f.tabsSettingsMenu:TriggerEvent(BankPanelTabSettingsMenuMixin.Event.OpenTabSettingsRequested, self.tabID + containerIDoffset)
@@ -108,7 +95,6 @@ if S.WoWVersion() >= 11 then
                         f.tabsSettingsMenu:SetPoint("BOTTOM", self, "TOP")
                     end
                 end
-            elseif button == "LeftButton" then
             end
             if self:GetChecked() then
                 f.selectedTab = self.tabID
@@ -134,7 +120,7 @@ if S.WoWVersion() >= 11 then
     end
     function f.tabsFrame:Update()
         local numTabs = C_Bank.FetchNumPurchasedBankTabs(bankType)
-        local tabData = Sorted_AccountData.bankTabData
+        local tabData = Sorted_Data[UnitGUID("player")].bankTabData
         for i = 1, maxBankSlots do
             if i <= numTabs and tabData[i] then
                 f.tabs[i]:Show()
@@ -153,12 +139,8 @@ if S.WoWVersion() >= 11 then
             f.middleFrame:SetPoint("LEFT", f.tabsFrame, "RIGHT")
         else
             self.buyTabButton:Show()
-            if not S.Utils.NewBankSystem() then
-                self.buyTabButton.text:SetText(S.Utils.FormatValueString(C_Bank.FetchNextPurchasableBankTabCost(bankType)))
-            else
-                local nextPurchasableTabData = C_Bank.FetchNextPurchasableBankTabData(bankType)
-                self.buyTabButton.text:SetText(S.Utils.FormatValueString(nextPurchasableTabData.tabCost))
-            end
+            local nextPurchasableTabData = C_Bank.FetchNextPurchasableBankTabData(bankType)
+            self.buyTabButton.text:SetText(S.Utils.FormatValueString(nextPurchasableTabData.tabCost))
             f.middleFrame:SetPoint("LEFT", self.buyTabButton.text, "RIGHT")
         end
     end
@@ -167,13 +149,8 @@ if S.WoWVersion() >= 11 then
     f.tabsFrame:RegisterEvent("PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED")
     f.tabsFrame:SetScript("OnEvent", f.tabsFrame.Update)
 
-    local b
-    if not S.Utils.NewBankSystem() then
-        b = (AccountBankPanel or BankPanel).PurchasePrompt.TabCostFrame.PurchaseButton
-    else
-        b = CreateFrame("Button", nil, f.tabsFrame, "BankPanelPurchaseButtonScriptTemplate")
-        b:SetAttribute("overrideBankType", bankType)
-    end
+    local b = CreateFrame("Button", nil, f.tabsFrame, "BankPanelPurchaseButtonScriptTemplate")
+    b:SetAttribute("overrideBankType", bankType)
     for k,v in pairs(b) do
         if type(v) == "table" and v.Hide then
             v:Hide()
@@ -199,75 +176,14 @@ if S.WoWVersion() >= 11 then
     end)
     b:HookScript("OnLeave", S.Tooltip.Cancel)
 
-    
-    -- Money
-    f.moneyFrame = S.FrameTools.CreateMoneyFrame(f)
-    f.moneyFrame:SetPoint("BOTTOMRIGHT", -32, 0)
-    function f.moneyFrame:Update()
-        local data = Sorted_AccountData
-        data.money = C_Bank.FetchDepositedMoney(bankType)
 
-        local money = data.money
-        if not money then money = 0 end  -- for guilds without money
-        if money >= 10000000000 then -- Hide silvers/coppers when guild has >1mil gold
-            money = math.floor(money / 10000) * 10000
-        elseif money >= 100000000 then -- Hide coppers when guild has >10k gold
-            money = math.floor(money / 100) * 100
-        end
-        self.text:SetText(GetMoneyString(money, true)) 
-        self:SetWidth(self.text:GetWidth() + 40)
-    end
-    f.moneyFrame:RegisterEvent("ACCOUNT_MONEY")
-    f.moneyFrame:SetScript("OnEvent", function(self)
-        self:Update()
-    end)
-    f.moneyFrame:SetScript("OnShow", function(self)
-        self:Update()
-    end)
-
-    f.depositButton = CreateFrame("BUTTON", nil, f)
-    f.depositButton:SetPoint("LEFT", f.moneyFrame, "RIGHT", 0, 1)
-    f.depositButton:SetSize(28, 28)
-    f.depositButton:SetNormalTexture("Interface\\Addons\\Sorted\\Textures\\Deposit-Withdraw")
-    f.depositButton:GetNormalTexture():SetTexCoord(0, 0.5, 0, 0.5)
-    f.depositButton:SetHighlightTexture("Interface\\Addons\\Sorted\\Textures\\Button-Highlight")
-    f.depositButton:SetPushedTexture("Interface\\Addons\\Sorted\\Textures\\Deposit-Withdraw")
-    f.depositButton:GetPushedTexture():SetTexCoord(0.5, 1, 0, 0.5)
-    f.depositButton:SetScript("OnEnter", function(self)
-        S.Tooltip.CreateText(self, "ANCHOR_TOP", BANK_DEPOSIT_MONEY_BUTTON_LABEL )
-    end)
-    f.depositButton:SetScript("OnLeave", function(self)
-        S.Tooltip.Cancel()
-    end)
-    f.depositButton:SetScript("OnClick", function(self)
-        StaticPopup_Show("BANK_MONEY_DEPOSIT", nil, nil, { bankType = bankType })
-    end)
-
-    f.withdrawButton = CreateFrame("BUTTON", nil, f)
-    f.withdrawButton:SetPoint("RIGHT", f.moneyFrame, "LEFT", 0, 1)
-    f.withdrawButton:SetSize(28, 28)
-    f.withdrawButton:SetNormalTexture("Interface\\Addons\\Sorted\\Textures\\Deposit-Withdraw")
-    f.withdrawButton:GetNormalTexture():SetTexCoord(0, 0.5, 0.5, 1)
-    f.withdrawButton:SetHighlightTexture("Interface\\Addons\\Sorted\\Textures\\Button-Highlight")
-    f.withdrawButton:SetPushedTexture("Interface\\Addons\\Sorted\\Textures\\Deposit-Withdraw")
-    f.withdrawButton:GetPushedTexture():SetTexCoord(0.5, 1, 0.5, 1)
-    f.withdrawButton:SetScript("OnEnter", function(self)
-        S.Tooltip.CreateText(self, "ANCHOR_TOP", BANK_WITHDRAW_MONEY_BUTTON_LABEL )
-    end)
-    f.withdrawButton:SetScript("OnLeave", function(self)
-        S.Tooltip.Cancel()
-    end)
-    f.withdrawButton:SetScript("OnClick", function(self)
-        StaticPopup_Show("BANK_MONEY_WITHDRAW", nil, nil, { bankType = bankType })
-    end)
-
-    -- Deposit warbound items
+    -- Deposit reagnents button
     f.middleFrame = CreateFrame("FRAME", nil, f)
     f.middleFrame:SetPoint("LEFT", f.tabsFrame, "RIGHT")
-    f.middleFrame:SetPoint("RIGHT", f.withdrawButton, "LEFT")
+    f.middleFrame:SetPoint("RIGHT", f, "RIGHT")
     f.middleFrame:SetHeight(32)
-    f.middleFrame.depositWarboundItemsButton = CreateFrame("BUTTON", nil, f.middleFrame)
-    b = f.middleFrame.depositWarboundItemsButton
+    f.middleFrame.depositReagnentsButton = CreateFrame("BUTTON", nil, f.middleFrame)
+    b = f.middleFrame.depositReagnentsButton
     b:SetPoint("CENTER", -20, 0)
     b:SetSize(39.4, 32)
     b:SetNormalTexture("Interface\\Addons\\Sorted\\Textures\\Deposit-Warband-Button")
@@ -283,7 +199,7 @@ if S.WoWVersion() >= 11 then
         b:SetPoint("CENTER", -20, 0)
     end)
     b:SetScript("OnEnter", function(self)
-        S.Tooltip.CreateText(self, "ANCHOR_TOP", ACCOUNT_BANK_DEPOSIT_BUTTON_LABEL)
+        S.Tooltip.CreateText(self, "ANCHOR_TOP", CHARACTER_BANK_DEPOSIT_BUTTON_LABEL)
     end)
     b:SetScript("OnLeave", function(self)
         S.Tooltip.Cancel()
@@ -292,66 +208,12 @@ if S.WoWVersion() >= 11 then
         C_Bank.AutoDepositItemsIntoBank(bankType)
     end)
 
-    f.middleFrame.includeReagentsCheckbox = CreateFrame("CheckButton", nil, f.middleFrame)
-    local cb = f.middleFrame.includeReagentsCheckbox
-    cb:SetSize(24, 24)
-    cb:SetNormalTexture("Interface\\Addons\\Sorted\\Textures\\Checkbox")
-    cb:SetHighlightTexture("Interface\\Addons\\Sorted\\Textures\\Checkbox-Highlight")
-    cb:SetPushedTexture("Interface\\Addons\\Sorted\\Textures\\Checkbox")
-    cb:SetCheckedTexture("Interface\\Addons\\Sorted\\Textures\\Checkbox-Tick")
-    cb:SetPoint("CENTER", 16, -2)
-    cb:SetScript("OnEnter", function(self)
-        S.Tooltip.CreateText(self, "ANCHOR_TOP", BANK_DEPOSIT_INCLUDE_REAGENTS_CHECKBOX_LABEL)
-    end)
-    cb:SetScript("OnLeave", function(self)
-        S.Tooltip.Cancel()
-    end)
-    cb:SetScript("OnShow", function(self)
-        self:SetChecked(GetCVarBool("bankAutoDepositReagents"))
-    end)
-    cb:SetScript("OnClick", function(self)
-        SetCVar("bankAutoDepositReagents", self:GetChecked())
-    end)
-
-
-    -- Account bank locked warning
-    f.lockPrompt = CreateFrame("FRAME", nil, f)
-    f.lockPrompt:SetAllPoints()
-    f.lockPrompt:SetFrameLevel(f:GetFrameLevel() + 100)
-    f.lockPrompt:SetScript("OnMouseDown", function() end)
-    f.lockPrompt.bg = f.lockPrompt:CreateTexture()
-    f.lockPrompt.bg:SetColorTexture(0, 0, 0, 0.4)
-    f.lockPrompt.bg:SetAllPoints()
-    f.lockPrompt.text = f.lockPrompt:CreateFontString(nil, "OVERLAY", "SortedFont")
-    f.lockPrompt.text:SetPoint("TOPLEFT", 50, -50)
-    f.lockPrompt.text:SetPoint("BOTTOMRIGHT", -50, 50)
-    f.lockPrompt.text:SetWordWrap(true)
-    f.lockPrompt.text:SetJustifyH("CENTER")
-    f.lockPrompt.text:SetJustifyV("MIDDLE")
-    f.lockPrompt.text:SetText(ACCOUNT_BANK_LOCKED_PROMPT)
-    f.lockPrompt.text:SetTextScale(1.5)
-
-
-
     -- Hide controls when player isn't at a bank
     S.Utils.RunOnEvent(f, "BankOpened", function(self)
-        self.depositButton:Show()
-        self.withdrawButton:Show()
         self.middleFrame:Show()
-        if not C_PlayerInfo.HasAccountInventoryLock() then
-            self.lockPrompt:Show()
-        else
-            self.lockPrompt:Hide()
-        end
     end)
     S.Utils.RunOnEvent(f, "BankClosed", function(self)
-        self.depositButton:Hide()
-        self.withdrawButton:Hide()
         self.middleFrame:Hide()
-        self.lockPrompt:Hide()
     end)
-    f.depositButton:Hide()
-    f.withdrawButton:Hide()
     f.middleFrame:Hide()
-    f.lockPrompt:Hide()
 end

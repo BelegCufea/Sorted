@@ -40,6 +40,7 @@ local defaultSettings = {   -- Defaults
     ["smoothingAmount"] = 0.1,
     ["tooltipDelay"] = 0,
     ["tooltipInfo"] = 1,
+    ["tooltipInfoRealmOnly"] = 1,
     ["iconBorders"] = 1,
     ["iconBordersGrid"] = 1,
     ["iconBorderThickness"] = 2.1,

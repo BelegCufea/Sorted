@@ -184,13 +184,13 @@ local function QueryItemCounts(i, itemID, GUIDs, tooltipID)
     for _, bag in pairs(S.Utils.ContainersOfType(S.CONTAINER_TYPES.BANK)) do
         for _, itemData in pairs(data.containers[bag]) do
             if itemData.itemID == itemID and itemData.count then
-                bagCount = bagCount + itemData.count
+                bankCount = bankCount + itemData.count
             end
         end
     end
 
     local reagentCount = 0
-    if S.WoWVersion() >= 6 then
+    if S.WoWVersion() >= 6 and not S.Utils.NewBankSystem() then
         for _, itemData in pairs(data.containers[REAGENTBANK_CONTAINER]) do
             if itemData.itemID == itemID and itemData.count then
                 bagCount = bagCount + itemData.count
@@ -210,7 +210,7 @@ local function QueryItemCounts(i, itemID, GUIDs, tooltipID)
         line.nameString:Show()
         line.bagString:Show()
         line.bankString:Show()
-        if S.WoWVersion() >= 6 then
+        if S.WoWVersion() >= 6 and not S.Utils.NewBankSystem() then
             line.reagentString:SetText(S.Utils.FormatNumber(reagentCount))
             if reagentCount > 0 then line.reagentString:SetTextColor(textColor.r, textColor.g, textColor.b) else line.reagentString:SetTextColor(grayedTextColor.r, grayedTextColor.g, grayedTextColor.b) end
             line.reagentString:Show()
@@ -234,6 +234,26 @@ local function QueryItemCounts(i, itemID, GUIDs, tooltipID)
             C_Timer.After(0.0001, function() QueryItemCounts(i, itemID, GUIDs, tooltipID) end)
         else
             QueryItemCounts(i, itemID, GUIDs, tooltipID)
+        end
+    else
+        local accountCount = 0
+        if S.WoWVersion() >= 11 then
+            for _, bag in pairs(Sorted_AccountData.containers) do
+                for _, itemData in pairs(bag) do
+                    if itemData.itemID == itemID and itemData.count then
+                        accountCount = accountCount + itemData.count
+                    end
+                end
+            end
+            if accountCount > 0 then
+                i = i + 1
+                extraTooltip:SetHeight(i * 22 + 40)
+                local line = GetLine(i)
+                line.nameString:SetText(S.Utils.FormatFaction()..REPUTATION_SORT_TYPE_ACCOUNT)
+                line.bankString:SetText(S.Utils.FormatNumber(accountCount))
+                line.nameString:Show()
+                line.bankString:Show()
+            end
         end
     end
 end
@@ -266,7 +286,7 @@ function S.Tooltip.Extended(bag, slot)
 
     local GUIDs = {UnitGUID("player")}
     for GUID, data in pairs(Sorted_Data) do
-        if data.realm == GetRealmName() and GUID ~= UnitGUID("player") then
+        if (S.Settings.Get("tooltipInfoRealmOnly") == 0 or data.realm == GetRealmName()) and GUID ~= UnitGUID("player") then
             table.insert(GUIDs, GUID)
         end
     end
@@ -297,7 +317,7 @@ function S.Tooltip.ExtendedCurrency(currency)
     local t = {}
     local max = 0
     for GUID, data in pairs(Sorted_Data) do
-        if data.realm == GetRealmName() then
+        if S.Settings.Get("tooltipInfoRealmOnly") == 0 or data.realm == GetRealmName() then
             if data.currencies[currency.id] then
                 local count = data.currencies[currency.id].count
                 if count > max then

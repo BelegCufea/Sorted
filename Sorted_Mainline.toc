@@ -1,4 +1,4 @@
-## Interface: 110002
+## Interface: 110107, 110200
 ## Title: |A:::|a|TInterface\Addons\Sorted\Textures\Addon-Text:24:96|t
 ## Notes: Modern bag interface with efficient searching and filters.
 ## Notes-frFR: Interface de Sac moderne avec un système de recherche et de filtre efficace.
@@ -15,6 +15,18 @@
 ## DefaultState: enabled
 ## AddonCompartmentFunc: Sorted_OpenSettings
 ## IconTexture: Interface\AddOns\Sorted\Textures\Addon-Icon
+
+## Category-enUS: Inventory
+## Category-deDE: Inventar
+## Category-esES: Inventario
+## Category-esMX: Inventario
+## Category-frFR: Inventaire
+## Category-itIT: Inventario
+## Category-koKR: 소지품
+## Category-ptBR: Inventário
+## Category-ruRU: Предметы
+## Category-zhCN: 物品栏
+## Category-zhTW: 物品欄
 
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
@@ -44,6 +56,7 @@ List_Currencies.lua
 List_VoidStorage.lua
 
 FrameBuilder.lua
+FrameBuilder_Bank.lua
 FrameBuilder_Warbank.lua
 FrameBuilder_GuildBank.lua
 FrameBuilder_CurrencyTracker.lua

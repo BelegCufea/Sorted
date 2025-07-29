@@ -149,6 +149,9 @@ local function InitialiseData()
     if not sortedData[playerGUID].containerNumSlots then
         sortedData[playerGUID].containerNumSlots = {}
     end
+    if not sortedData[playerGUID].bankTabData then
+        sortedData[playerGUID].bankTabData = {}
+    end
     if not sortedData[playerGUID].inventoryItems then
         sortedData[playerGUID].inventoryItems = {}
     end
@@ -164,7 +167,7 @@ local function UpdatePlayerData()
     playerData.faction = UnitFactionGroup("player")
     playerData.realm = GetRealmName()
     _, playerData.class = UnitClass("player")
-    if S.WoWVersion() >= 6 and not IsReagentBankUnlocked() then
+    if S.WoWVersion() >= 6 and not S.Utils.NewBankSystem() and not IsReagentBankUnlocked() then
         playerData.reagentNotUnlocked = true
     else
         playerData.reagentNotUnlocked = nil
@@ -424,19 +427,19 @@ local function UpdateBagContents(container)
         GetData(playerGUID).bankNotCached = nil
         for k, bagID in pairs(S.Utils.ContainersOfType("BANK")) do 
             if not container or bagID == container then
-                for slotID = 1, S.Utils.MaxBagSlots() do
+                for slotID = 1, S.Utils.MaxBankSlots() do
                     S.Data.UpdateItem(bagID, slotID)
                 end
             end
         end
         -- Container buttons
-        for slotID = 1, NUM_BANKBAGSLOTS do
+        for slotID = 1, NUM_BANKBAGSLOTS or 0 do
             S.Data.UpdateItem(-4, slotID)
         end
     end
 
     -- Reagent bank
-    if S.WoWVersion() >= 6 and S.IsBankOpened() and IsReagentBankUnlocked() then
+    if S.WoWVersion() >= 6 and not S.Utils.NewBankSystem() and S.IsBankOpened() and IsReagentBankUnlocked() then
         GetData(playerGUID).reagentNotUnlocked = nil
         if not container or REAGENTBANK_CONTAINER == container then
             for slotID = 1, 98 do
@@ -927,8 +930,15 @@ end
 
 -- ACCOUNT BANK FUNCTIONS
 function S.Data.UpdateAccountBankTabs()
-    local bankTabData = C_Bank.FetchPurchasedBankTabData(2)
+    local bankTabData = C_Bank.FetchPurchasedBankTabData(Enum.BankType.Account)
     S.Utils.CopyTable(bankTabData, Sorted_AccountData.bankTabData)
+    S.Utils.TriggerEvent("BankTabsUpdated")
+end
+
+-- BANK FUNCTIONS
+function S.Data.UpdateBankTabs()
+    local bankTabData = C_Bank.FetchPurchasedBankTabData(Enum.BankType.Character)
+    S.Utils.CopyTable(bankTabData, Sorted_Data[UnitGUID("player")].bankTabData)
     S.Utils.TriggerEvent("BankTabsUpdated")
 end
 
@@ -1352,6 +1362,9 @@ local function BankFrameOpenedDelayed()
         UpdateBagContents()
         if S.WoWVersion() >= 11 then
             S.Data.UpdateAccountBankTabs()
+            if S.Utils.NewBankSystem() then
+                S.Data.UpdateBankTabs()
+            end
         end
         S.Utils.TriggerEvent("BankOpened")
     end
@@ -1373,13 +1386,15 @@ eventHandlerFrame:RegisterEvent("GUILDBANKBAGSLOTS_CHANGED")
 if S.WoWVersion() >= 3 then
     eventHandlerFrame:RegisterEvent("EQUIPMENT_SETS_CHANGED")
 end
-if S.WoWVersion() >= 6 then
+if S.WoWVersion() >= 6 and not S.Utils.NewBankSystem() then
     eventHandlerFrame:RegisterEvent("REAGENTBANK_PURCHASED")
 end
 eventHandlerFrame:RegisterEvent("PLAYER_GUILD_UPDATE")
 eventHandlerFrame:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
-eventHandlerFrame:RegisterEvent("VOID_STORAGE_CONTENTS_UPDATE")
-eventHandlerFrame:RegisterEvent("VOID_TRANSFER_DONE")
+if not S.Utils.NewBankSystem() then
+    eventHandlerFrame:RegisterEvent("VOID_STORAGE_CONTENTS_UPDATE")
+    eventHandlerFrame:RegisterEvent("VOID_TRANSFER_DONE")
+end
 eventHandlerFrame:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
 eventHandlerFrame:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE")
 eventHandlerFrame:SetScript("OnEvent", function(self, event, param1, param2, param3)
@@ -1442,6 +1457,7 @@ eventHandlerFrame:SetScript("OnEvent", function(self, event, param1, param2, par
         S.Utils.TriggerEvent("BankClosed")
     elseif event == "BANK_TAB_SETTINGS_UPDATED" then
         S.Data.UpdateAccountBankTabs()
+        S.Data.UpdateBankTabs()
     elseif event == "EQUIPMENT_SETS_CHANGED" then
         UpdateEquipmentSets()
     elseif event == "REAGENTBANK_PURCHASED" then

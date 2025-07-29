@@ -234,14 +234,16 @@ end]]
 if S.WoWVersion() > 1 then
     S.CurrencyList = S.CreateCurrencyList(f.sideFrame.content)
 end
-S.BankItemList = S.CreateItemList(f.sideFrame.content, "BANK", 400, "ContainerFrameItemButtonTemplate")
-table.insert(S.itemLists, S.BankItemList)
-for _, containerID in pairs(S.Utils.ContainersOfType("BANK")) do
-    if containerID ~= BANK_CONTAINER then
-        S.BankItemList:AddContainerButton(containerID)
+if not S.Utils.NewBankSystem() then
+    S.BankItemList = S.CreateItemList(f.sideFrame.content, "BANK", 400, "ContainerFrameItemButtonTemplate")
+    table.insert(S.itemLists, S.BankItemList)
+    for _, containerID in pairs(S.Utils.ContainersOfType("BANK")) do
+        if containerID ~= BANK_CONTAINER then
+            S.BankItemList:AddContainerButton(containerID)
+        end
     end
 end
-if S.WoWVersion() >= 6 then
+if S.WoWVersion() >= 6 and not S.Utils.NewBankSystem() then
     S.ReagentItemList = S.CreateItemList(f.sideFrame.content, "REAGENT", 400, "ReagentBankItemButtonGenericTemplate")
     table.insert(S.itemLists, S.ReagentItemList)
 elseif S.WoWVersion() <= 3 then
@@ -469,9 +471,11 @@ if S.WoWVersion() == 1 then
     end)
 else
     CreateSideTab(f.sideTabFrame, S.Localize("TAB_CURRENCY"), "CURRENCY", S.CurrencyList)
-    CreateSideTab(f.sideTabFrame, S.Localize("TAB_BANK"), "BANK", S.BankItemList)
+    if not S.Utils.NewBankSystem() then
+        CreateSideTab(f.sideTabFrame, S.Localize("TAB_BANK"), "BANK", S.BankItemList)
+    end
 
-    if S.WoWVersion() >= 6 then
+    if S.WoWVersion() >= 6 and not S.Utils.NewBankSystem() then
         CreateSideTab(f.sideTabFrame, S.Localize("TAB_REAGENTS"), "REAGENTS", S.ReagentItemList)
     elseif S.WoWVersion() <= 3 then
         CreateSideTab(f.sideTabFrame, KEYRING, "KEYRING", S.KeyringItemList)
@@ -479,10 +483,16 @@ else
     SelectSideTab(nil)
     S.Utils.RunOnEvent(nil, "BankOpened", function()
         SelectSideTab("BANK", true)
+        if S.Utils.NewBankSystem() then
+            BankFrame.BankPanel:Show()
+        end
     end)
 end
 S.Utils.RunOnEvent(nil, "BankClosed", function()
     SelectSideTab(nil, true)
+    if S.Utils.NewBankSystem() then
+        BankFrame.BankPanel:Hide()
+    end
 end)
 
 function S.AddSideTab(text, key)

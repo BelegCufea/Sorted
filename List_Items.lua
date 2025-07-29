@@ -1081,7 +1081,16 @@ local function DelayedFilter(self)
             -- Warbank tabs
             if S.Utils.ContainerIsType(entry.data.bag, "ACCOUNT") then
                 local selectedTab = S.GetAccountBankSelectedTab()
-                if selectedTab and selectedTab ~= entry.data.bag - 12 then
+                local offsetContainerID = S.Utils.NewBankSystem() and 11 or 12
+                if selectedTab and selectedTab ~= entry.data.bag - offsetContainerID then
+                    entry.filtered = true
+                end
+            end
+
+            if S.Utils.ContainerIsType(entry.data.bag, "BANK") then
+                local selectedTab = S.GetBankSelectedTab()
+                local offsetContainerID = 5
+                if selectedTab and selectedTab ~= entry.data.bag - offsetContainerID then
                     entry.filtered = true
                 end
             end
@@ -1217,7 +1226,13 @@ local function FreeSpaceTooltip(self)
     for i,container in pairs(containers) do
         local itemName, _, itemRarity
 
-        if container ~= BANK_CONTAINER and container ~= BACKPACK_CONTAINER and container ~= REAGENTBANK_CONTAINER and container ~= KEYRING_CONTAINER and not S.Utils.ContainerIsType(container, "ACCOUNT") then
+        if container ~= BANK_CONTAINER
+            and container ~= BACKPACK_CONTAINER
+            and container ~= REAGENTBANK_CONTAINER
+            and container ~= KEYRING_CONTAINER
+            and not S.Utils.ContainerIsType(container, "ACCOUNT")
+            and not (S.Utils.NewBankSystem() and S.Utils.ContainerIsType(container, "BANK")) then
+
             local invID = ContainerIDToInventoryID(container)
             local itemLink = GetInventoryItemLink("player", invID)
             if itemLink then
@@ -1226,15 +1241,22 @@ local function FreeSpaceTooltip(self)
         else
             if self.type == "BAGS" then
                 itemName, itemRarity = BACKPACK_TOOLTIP, 1
-            elseif self.type == "BANK" then
+            elseif self.type == "BANK" and not S.Utils.NewBankSystem() then
                 itemName, itemRarity = BANK, 1
             elseif self.type == "REAGENT" then
                 itemName, itemRarity = REAGENT_BANK, 1
             elseif self.type == "KEYRING" then
                 itemName, itemRarity = KEYRING, 1
             elseif self.type == "ACCOUNT" then
+                local accountContainer = container - (S.Utils.NewBankSystem() and 11 or 12)
                 if Sorted_AccountData.containerNumSlots[container] and Sorted_AccountData.containerNumSlots[container].numSlots > 0 then
-                    itemName, itemRarity = Sorted_AccountData.bankTabData[container-12].name, 1
+                    itemName, itemRarity = Sorted_AccountData.bankTabData[accountContainer].name, 1
+                else
+                    itemName, itemRarity = nil, nil
+                end
+            elseif self.type == "BANK" then
+                if Sorted_Data[UnitGUID("player")].containerNumSlots[container] and Sorted_Data[UnitGUID("player")].containerNumSlots[container].numSlots > 0 then
+                    itemName, itemRarity = Sorted_Data[UnitGUID("player")].bankTabData[container-5].name, 1
                 else
                     itemName, itemRarity = nil, nil
                 end
@@ -1591,7 +1613,7 @@ function S.CreateItemList(parent, type, minWidth, itemButtonTemplate)
     list.OnUpdate2 = OnUpdate2
     list:SetScript("OnUpdate", OnUpdate)
 
-    if type == "BANK" then
+    if type == "BANK" and not S.Utils.NewBankSystem() then
         list.UpdateContainerButtons = UpdateContainerButtonsBank
     else
         list.UpdateContainerButtons = UpdateContainerButtons
@@ -1722,22 +1744,36 @@ function S.CreateItemList(parent, type, minWidth, itemButtonTemplate)
 
     list:HookScript("OnShow", function(self)
         -- Update BankFrame.selectedTab so items will go into either the bank or reagent bank correctly
-        if self.type == "BANK" then
-            BankFrame.selectedTab = 1
-            if BankFrameTab1 then
-                BankFrameTab1:Click()
+        if not S.Utils.NewBankSystem() then
+            if self.type == "BANK" then
+                BankFrame.selectedTab = 1
+                if BankFrameTab1 then
+                    BankFrameTab1:Click()
+                end
+                self:UpdateBankWarningMessage()
+            elseif self.type == "REAGENT" then
+                BankFrame.selectedTab = 2
+                if BankFrameTab2 then
+                    BankFrameTab2:Click()
+                end
+                self:UpdateReagentWarningMessage()
+            elseif self.type == "ACCOUNT" then
+                BankFrame.selectedTab = 3
+                if BankFrameTab3 then
+                    BankFrameTab3:Click()
+                end
             end
-            self:UpdateBankWarningMessage()
-        elseif self.type == "REAGENT" then
-            BankFrame.selectedTab = 2
-            if BankFrameTab2 then
-                BankFrameTab2:Click()
-            end
-            self:UpdateReagentWarningMessage()
-        elseif self.type == "ACCOUNT" then
-            BankFrame.selectedTab = 3
-            if BankFrameTab3 then
-                BankFrameTab3:Click()
+        else
+            if self.type == "BANK" then
+                if S.IsBankOpened() then
+                    BankFrame.BankPanel:Show()
+                    BankFrame.BankPanel.bankType = Enum.BankType.Character
+                end
+            elseif self.type == "ACCOUNT" then
+                if S.IsBankOpened() then
+                    BankFrame.BankPanel:Show()
+                    BankFrame.BankPanel.bankType = Enum.BankType.Account
+                end
             end
         end
     end)
@@ -1834,13 +1870,15 @@ function S.CreateItemList(parent, type, minWidth, itemButtonTemplate)
         b.text:SetPoint("LEFT", b, "RIGHT")
         b.text:SetTextColor(1, 0.92, 0.8)
         b:SetScript("OnClick", PurchaseSlot)
-        list:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
-        list:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
-        list:HookScript("OnEvent", function(self, event)
-            if event == "PLAYERBANKBAGSLOTS_CHANGED" or event == "PLAYERBANKSLOTS_CHANGED" then
-                self:UpdateContainerButtons()
-            end
-        end)
+        if not S.Utils.NewBankSystem() then
+            list:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
+            list:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
+            list:HookScript("OnEvent", function(self, event)
+                if event == "PLAYERBANKBAGSLOTS_CHANGED" or event == "PLAYERBANKSLOTS_CHANGED" then
+                    self:UpdateContainerButtons()
+                end
+            end)
+        end
         S.Utils.RunOnEvent(list, "BankOpened", list.UpdateContainerButtons)
         S.Utils.RunOnEvent(list, "BankClosed", list.UpdateContainerButtons)
         b:SetScript("OnEnter", function(self)
