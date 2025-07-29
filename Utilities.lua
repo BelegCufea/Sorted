@@ -248,9 +248,9 @@ local function MakeBlizzBagsKillable()
         for i = 1, NUM_CONTAINER_FRAMES do
             KillFramePermanently(_G["ContainerFrame"..i])
         end
-        if not S.UseNewBank() then
+        --if not S.UseNewBank() then
             KillFramePermanently(_G["BankFrame"])
-        end
+        --end
     else
         if _G["ContainerFrameCombinedBags"] then
             MakeFrameKillable(_G["ContainerFrameCombinedBags"])
@@ -258,9 +258,9 @@ local function MakeBlizzBagsKillable()
         for i = 1, NUM_CONTAINER_FRAMES do
             MakeFrameKillable(_G["ContainerFrame"..i])
         end
-        if not S.UseNewBank() then
+        --if not S.UseNewBank() then
             MakeFrameKillable(_G["BankFrame"])
-        end
+        --end
     end
     if _G["GwBagFrame"] then
         MakeFrameKillable(_G["GwBagFrame"])
@@ -276,15 +276,15 @@ function S.Utils.KillBlizzBags()
     killableFramesParent:Hide()
 end
 function S.Utils.ResurrectBlizzBags()
-    --[[S.Disable()
-    killableFramesParent:Show()]]
+    S.Disable()
+    killableFramesParent:Show()
 end
 function S.Utils.ToggleBlizzBags()
-    --[[if killableFramesParent:IsShown() then
+    if killableFramesParent:IsShown() then
         S.Utils.KillBlizzBags()
     else
         S.Utils.ResurrectBlizzBags()
-    end]]
+    end
 end
 
 local function CreateToggleButton(parent)
@@ -354,7 +354,7 @@ local function CreateBlizzToggleButtons()
 end
 
 S.Utils.RunOnEvent(nil, "EnteredWorld", function()
-    --CreateBlizzToggleButtons()   - Disabled since 11.2, due to changes with the bank frame
+    CreateBlizzToggleButtons()   -- Disabled since 11.2, due to changes with the bank frame
     MakeBlizzBagsKillable()
     S.Utils.KillBlizzBags()
 end)

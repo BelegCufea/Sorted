@@ -4,7 +4,8 @@ local pairs, ipairs, string, type, time = pairs, ipairs, string, type, time
 -- The War Within 11.2 Bank
 if S.WoWVersion() >= 11 and S.UseNewBank() then
     -- Side tab
-    local sideTab, f = S.AddSideTab(BANK, "BANK", BankFrame.TabSystem:GetTabButton(BankFrame.characterBankTabID))
+    --local sideTab, f = S.AddSideTab(BANK, "BANK", BankFrame.TabSystem:GetTabButton(BankFrame.characterBankTabID))
+    local sideTab, f = S.AddSideTab(BANK, "BANK")
 
     -- Item list
     f.itemList = S.CreateItemList(f, "BANK", 500, "ContainerFrameItemButtonTemplate")
