@@ -36,15 +36,25 @@ if S.WoWVersion() >= 11 then
     S.Utils.RunOnEvent(f.tabsSettingsMenu, "BankClosed", f.tabsSettingsMenu.Hide)
 
     -- Override blizz functions
-    function f.tabsSettingsMenu:GetSelectedTabData()
-        return Sorted_AccountData.bankTabData[f.selectedTabSettings]
-    end
-    function f.tabsSettingsMenu:GetBankFrame()
-        return f
-    end
-    f.selectedTabSettings = 1
-    function f:GetTabData(selectedTabID)
-        return Sorted_AccountData.bankTabData[f.selectedTabSettings]
+    if S.UseNewBank() then
+        function f.tabsSettingsMenu.GetBankPanel()
+        return {
+            GetTabData = function(tabID)
+                return Sorted_AccountData.bankTabData[f.selectedTabSettings]
+            end
+        }
+        end
+    else
+        function f.tabsSettingsMenu:GetSelectedTabData()
+            return Sorted_AccountData.bankTabData[f.selectedTabSettings]
+        end
+        function f.tabsSettingsMenu:GetBankFrame()
+            return f
+        end
+        f.selectedTabSettings = 1
+        function f:GetTabData(selectedTabID)
+            return Sorted_AccountData.bankTabData[f.selectedTabSettings]
+        end
     end
 
 
