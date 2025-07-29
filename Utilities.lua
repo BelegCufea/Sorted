@@ -87,6 +87,12 @@ function S.Utils.MaxBagSlots()
     return MAX_BAG_SLOTS
 end
 
+-- Constant. Size of the largest bag/bank slot in WoW
+local MAX_BANK_SLOTS = 98
+function S.Utils.MaxBankSlots()
+    return S.UseNewBank() and MAX_BANK_SLOTS or MAX_BAG_SLOTS
+end
+
 
 -- Dealing with other bag frames
 --[[local killableFramesParent = CreateFrame("FRAME")

@@ -440,7 +440,7 @@ local function UpdateBagContents(container)
         GetData(playerGUID).bankNotCached = nil
         for k, bagID in pairs(S.Utils.ContainersOfType("BANK")) do 
             if not container or bagID == container then
-                for slotID = 1, S.Utils.MaxBagSlots() do
+                for slotID = 1, S.Utils.MaxBankSlots() do
                     S.Data.UpdateItem(bagID, slotID)
                 end
             end
