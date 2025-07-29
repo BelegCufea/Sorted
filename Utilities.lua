@@ -46,11 +46,23 @@ function S.Utils.GetContainerNumSlots(containerID)
     return GetContainerNumSlots(containerID)
 end
 S.Utils.GetContainerNumFreeSlots = GetContainerNumFreeSlots
+function S.Utils.FetchNextPurchasableBankTabData(bankType)
+    if C_Bank.FetchNextPurchasableBankTabData then
+        return C_Bank.FetchNextPurchasableBankTabData(bankType)
+    else
+        return {["tabCost"] = C_Bank.FetchNextPurchasableBankTabCost(bankType)}
+    end
+end
 
 -- S.WoWVersion() returns the major WoW version number, Classic: 1, TBC: 2, WotlK: 3, etc...
 local WoWMajorVersionNumber = tonumber(string.sub(GetBuildInfo(), 1, 2))
 function S.WoWVersion()
     return WoWMajorVersionNumber
+end
+local useNewBank = true
+if NUM_BANKBAGSLOTS then useNewBank = false end
+function S.UseNewBank()
+    return useNewBank
 end
 
 -- Returns the number of bags that can be equipped
@@ -179,7 +191,36 @@ end
 
 
 -- Dealing with other bag frames
--- Make them all children of 'killableFramesParent', which can be hidden or shown to enable or disable the killable frames
+local function NoneFunc() end
+function S.Utils.KillFrame(f)
+    if f.ClearAllPoints then
+        f:ClearAllPoints()
+        f:SetPoint("TOPLEFT", -10000, -10000)
+        f:SetPoint("BOTTOMRIGHT", -10000, -10000)
+    end
+    if f.UnregisterAllEvents then
+        f:UnregisterAllEvents()
+        f.OnShow = NoneFunc
+        f:SetScript("OnShow", NoneFunc)
+        f.OnHide = NoneFunc
+        f:SetScript("OnHide", NoneFunc)
+        f.OnEnter = NoneFunc
+        f:SetScript("OnEnter", NoneFunc)
+        f.OnLeave = NoneFunc
+        f:SetScript("OnLeave", NoneFunc)
+        f.OnEvent = NoneFunc
+        f:SetScript("OnEvent", NoneFunc)
+    end
+    if f.GetNumRegions then
+        for _, c in pairs(f) do
+            if c and type(c) == "table" then
+                S.Utils.KillFrame(c)
+            end
+        end
+    end
+end
+
+-- Make killable frames children of 'killableFramesParent', which can be hidden or shown to enable or disable the killable frames
 local killableFramesParent = CreateFrame("FRAME", nil, UIParent)
 killableFramesParent:SetAllPoints()
 killableFramesParent:SetFrameStrata("HIGH")
@@ -207,7 +248,9 @@ local function MakeBlizzBagsKillable()
         for i = 1, NUM_CONTAINER_FRAMES do
             KillFramePermanently(_G["ContainerFrame"..i])
         end
-        KillFramePermanently(_G["BankFrame"])
+        if not S.UseNewBank() then
+            KillFramePermanently(_G["BankFrame"])
+        end
     else
         if _G["ContainerFrameCombinedBags"] then
             MakeFrameKillable(_G["ContainerFrameCombinedBags"])
@@ -215,7 +258,9 @@ local function MakeBlizzBagsKillable()
         for i = 1, NUM_CONTAINER_FRAMES do
             MakeFrameKillable(_G["ContainerFrame"..i])
         end
-        MakeFrameKillable(_G["BankFrame"])
+        if not S.UseNewBank() then
+            MakeFrameKillable(_G["BankFrame"])
+        end
     end
     if _G["GwBagFrame"] then
         MakeFrameKillable(_G["GwBagFrame"])
@@ -231,15 +276,15 @@ function S.Utils.KillBlizzBags()
     killableFramesParent:Hide()
 end
 function S.Utils.ResurrectBlizzBags()
-    S.Disable()
-    killableFramesParent:Show()
+    --[[S.Disable()
+    killableFramesParent:Show()]]
 end
 function S.Utils.ToggleBlizzBags()
-    if killableFramesParent:IsShown() then
+    --[[if killableFramesParent:IsShown() then
         S.Utils.KillBlizzBags()
     else
         S.Utils.ResurrectBlizzBags()
-    end
+    end]]
 end
 
 local function CreateToggleButton(parent)
@@ -309,7 +354,7 @@ local function CreateBlizzToggleButtons()
 end
 
 S.Utils.RunOnEvent(nil, "EnteredWorld", function()
-    CreateBlizzToggleButtons()
+    --CreateBlizzToggleButtons()   - Disabled since 11.2, due to changes with the bank frame
     MakeBlizzBagsKillable()
     S.Utils.KillBlizzBags()
 end)
@@ -910,10 +955,18 @@ if S.WoWVersion() >= 10 then
         containersOfType["CONTAINER"..i] = { i }
     end
 
-    for i = NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS  + 1, NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS + NUM_BANKBAGSLOTS do 
-        table.insert(containersOfType[S.CONTAINER_TYPES.BANK], i) 
-        table.insert(containersOfType[S.CONTAINER_TYPES.ALL], i) 
-        containersOfType["CONTAINER"..i] = { i }
+    if S.UseNewBank() then
+        for i = Enum.BagIndex.CharacterBankTab_1, Enum.BagIndex.CharacterBankTab_6 do
+            table.insert(containersOfType[S.CONTAINER_TYPES.BANK], i) 
+            table.insert(containersOfType[S.CONTAINER_TYPES.ALL], i) 
+            containersOfType["CONTAINER"..i] = { i }
+        end
+    else
+        for i = NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS  + 1, NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS + NUM_BANKBAGSLOTS do 
+            table.insert(containersOfType[S.CONTAINER_TYPES.BANK], i) 
+            table.insert(containersOfType[S.CONTAINER_TYPES.ALL], i) 
+            containersOfType["CONTAINER"..i] = { i }
+        end
     end
 
 else
@@ -926,7 +979,7 @@ end
 -- Include account bank post-TWW
 if S.WoWVersion() >= 11 then
     containersOfType[S.CONTAINER_TYPES.ACCOUNT] = {}
-    for i = 13, 17 do
+    for i = Enum.BagIndex.AccountBankTab_1, Enum.BagIndex.AccountBankTab_5 do
         table.insert(containersOfType[S.CONTAINER_TYPES.ACCOUNT], i)
         table.insert(containersOfType[S.CONTAINER_TYPES.ALL], i)
     end
@@ -947,9 +1000,11 @@ end
 
 
 local containerTypes = {
-    [BANK_CONTAINER] = "BANK",
     [BACKPACK_CONTAINER] = "BAGS"
 }
+if not S.UseNewBank() then
+    containerTypes[BANK_CONTAINER] = "BANK"
+end
 if S.WoWVersion() >= 10 then
     for i = 1, NUM_BAG_SLOTS do 
         containerTypes[i] = "BAGS"
@@ -958,25 +1013,33 @@ if S.WoWVersion() >= 10 then
         containerTypes[i] = "BAGS"
         --containerTypes[i] = "REAGENT_BAGS"
     end
-    for i = NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS  + 1, NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS + NUM_BANKBAGSLOTS do 
-        containerTypes[i] = "BANK"
+    if S.UseNewBank() then
+        for i = Enum.BagIndex.CharacterBankTab_1, Enum.BagIndex.CharacterBankTab_6 do
+            containerTypes[i] = "BANK"
+        end
+    else
+        for i = NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS  + 1, NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS + NUM_BANKBAGSLOTS do 
+            containerTypes[i] = "BANK"
+        end
     end
 else
     for i = 1, NUM_BAG_SLOTS do 
         containerTypes[i] = "BAGS"
     end
-    for i = NUM_BAG_SLOTS + 1, NUM_BAG_SLOTS + NUM_BANKBAGSLOTS do 
-        containerTypes[i] = "BANK"
+    if not S.UseNewBank() then
+        for i = NUM_BAG_SLOTS + 1, NUM_BAG_SLOTS + NUM_BANKBAGSLOTS do 
+            containerTypes[i] = "BANK"
+        end
     end
 end
 if S.WoWVersion() >= 11 then
-    for i = 13, 17 do
+    for i = Enum.BagIndex.AccountBankTab_1, Enum.BagIndex.AccountBankTab_5 do
         containerTypes[i] = "ACCOUNT"
     end
 end
 if S.WoWVersion() < 4 then
     containerTypes[KEYRING_CONTAINER] = "KEYRING"
-elseif S.WoWVersion() >= 6 then
+elseif S.WoWVersion() >= 6 and not S.UseNewBank() then
     containerTypes[REAGENTBANK_CONTAINER] = "REAGENT"
 end
 function S.Utils.GetContainerType(container)

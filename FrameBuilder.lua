@@ -175,7 +175,7 @@ f.minimiseButton:Update()]]
 
 
 local texSizeX, texSizeY = 0.296875, 0.3125
-f.wowButton = CreateFrame("BUTTON", nil, f)
+--[[f.wowButton = CreateFrame("BUTTON", nil, f)
 f.wowButton:SetNormalTexture("Interface\\Addons\\Sorted\\Textures\\wow-button")
 f.wowButton:SetHighlightTexture("Interface\\Addons\\Sorted\\Textures\\wow-button")
 f.wowButton:SetPushedTexture("Interface\\Addons\\Sorted\\Textures\\wow-button")
@@ -189,7 +189,7 @@ f.wowButton:SetScript("OnClick", function(self, button, down)
     S.Utils.ResurrectBlizzBags()
     CloseAllBags()
     OpenAllBags()
-end)
+end)]]
 
 
 
@@ -234,14 +234,16 @@ end]]
 if S.WoWVersion() > 1 then
     S.CurrencyList = S.CreateCurrencyList(f.sideFrame.content)
 end
-S.BankItemList = S.CreateItemList(f.sideFrame.content, "BANK", 400, "ContainerFrameItemButtonTemplate")
-table.insert(S.itemLists, S.BankItemList)
-for _, containerID in pairs(S.Utils.ContainersOfType("BANK")) do
-    if containerID ~= BANK_CONTAINER then
-        S.BankItemList:AddContainerButton(containerID)
+if not S.UseNewBank() then
+    S.BankItemList = S.CreateItemList(f.sideFrame.content, "BANK", 400, "ContainerFrameItemButtonTemplate")
+    table.insert(S.itemLists, S.BankItemList)
+    for _, containerID in pairs(S.Utils.ContainersOfType("BANK")) do
+        if containerID ~= BANK_CONTAINER then
+            S.BankItemList:AddContainerButton(containerID)
+        end
     end
 end
-if S.WoWVersion() >= 6 then
+if S.WoWVersion() >= 6 and not S.UseNewBank() then
     S.ReagentItemList = S.CreateItemList(f.sideFrame.content, "REAGENT", 400, "ReagentBankItemButtonGenericTemplate")
     table.insert(S.itemLists, S.ReagentItemList)
 elseif S.WoWVersion() <= 3 then
@@ -260,27 +262,33 @@ local function GetSelectedSideTab()
     end
 end
 S.GetSelectedSideTab = GetSelectedSideTab
-local function SelectSideTab(key, dontToggle)
-    f.sideTabFrame:ClearAllPoints()
+local function PositionSideTabFrame()
     local currentSkin = S.Skinning.GetSkin()
-    if f.selectedSideTab == key and not dontToggle or key == nil then
-        f.selectedSideTab = nil
-        if currentSkin == S.Skinning.ADDONSKINS or currentSkin == S.Skinning.CLEAN then
-            f.sideTabFrame:SetPoint("BOTTOMRIGHT", f, "BOTTOMLEFT", 1, 16)
-        elseif currentSkin == S.Skinning.DEFAULT then
-            f.sideTabFrame:SetPoint("BOTTOMRIGHT", f, "BOTTOMLEFT", -1, 16)
-        end
-        f.sideFrame:Hide()
-    else
-        f.selectedSideTab = key
+    f.sideTabFrame:ClearAllPoints()
+    if f.selectedSideTab then
         if currentSkin == S.Skinning.ADDONSKINS or currentSkin == S.Skinning.CLEAN then
             f.sideTabFrame:SetPoint("BOTTOMRIGHT", f.sideFrame, "BOTTOMLEFT", 2, 16)
         elseif currentSkin == S.Skinning.DEFAULT then
             f.sideTabFrame:SetPoint("BOTTOMRIGHT", f.sideFrame, "BOTTOMLEFT", -1, 16)
         end
-        f.sideFrame:Show()
+    else
+        if currentSkin == S.Skinning.ADDONSKINS or currentSkin == S.Skinning.CLEAN then
+            f.sideTabFrame:SetPoint("BOTTOMRIGHT", f, "BOTTOMLEFT", 1, 16)
+        elseif currentSkin == S.Skinning.DEFAULT then
+            f.sideTabFrame:SetPoint("BOTTOMRIGHT", f, "BOTTOMLEFT", -1, 16)
+        end
     end
     f.sideTabFrame:SetSize(1,1) 
+end
+local function SelectSideTab(key, dontToggle)
+    if f.selectedSideTab == key and not dontToggle or key == nil then
+        f.selectedSideTab = nil
+        f.sideFrame:Hide()
+    else
+        f.selectedSideTab = key
+        f.sideFrame:Show()
+    end
+    PositionSideTabFrame()
     for i,v in ipairs(f.sideTabs) do
         v:Update(f.selectedSideTab == v.key)
     end
@@ -326,9 +334,18 @@ local function UpdateSideTab(self, selected)
         end
     end
 end
-local function CreateSideTab(parent, text, key, itemList)
-    local b = CreateFrame("BUTTON", nil, parent)
+local function CreateSideTab(parent, text, key, itemList, button)
+    local b = button
+    if b then
+        -- Use an existing tab button, e.g. the bank/warbank tabs
+        -- Those ones disable themselves when selected, we need to prevent that
+        b.SetEnabled = b.Enable
+        b.Disable = b.Enable
+    else
+        b = CreateFrame("BUTTON", nil, parent)
+    end
 
+    b:ClearAllPoints()
     b:SetPoint("RIGHT", parent, "LEFT")
     b:SetSize(34, 100)
     b.key = key
@@ -398,8 +415,12 @@ local function CreateSideTab(parent, text, key, itemList)
 
     b:RegisterForClicks("LeftButtonUp")
     b:RegisterForDrag("LeftButton")
-    b:SetScript("OnClick", function(self)
+
+    b:HookScript("OnClick", function(self)
         SelectSideTab(self.key)
+    end)
+    b:HookScript("OnEnter", function(self)
+        self:Enable()
     end)
 
     -- Resizing
@@ -411,22 +432,22 @@ local function CreateSideTab(parent, text, key, itemList)
         end
         f.sideFrame:SetWidth(width)
     end
-    b:SetScript("OnMouseDown", function(self)
+    b:HookScript("OnMouseDown", function(self)
         self.mouseStartX, _ = GetCursorPosition()
         self.scale = self:GetEffectiveScale()
         self.startWidth = f.sideFrame:GetWidth()
     end)
-    b:SetScript("OnDragStart", function(self)
+    b:HookScript("OnDragStart", function(self)
         if f.sideFrame:IsShown() then
             self:SetScript("OnUpdate", OnUpdate)
             OnUpdate(self)
         end
     end)
-    b:SetScript("OnDragStop", function(self)
+    b:HookScript("OnDragStop", function(self)
         self:SetScript("OnUpdate", nil)
     end)
 
-    b:SetScript("OnEnter", function(self) 
+    b:HookScript("OnEnter", function(self) 
         self.text:SetTextColor(0.95, 0.875, 0.7)
         if S.Skinning.GetSkin() == S.Skinning.ADDONSKINS then
             if f.selectedSideTab == self.key then
@@ -436,7 +457,7 @@ local function CreateSideTab(parent, text, key, itemList)
             end
         end
     end)
-    b:SetScript("OnLeave", function(self) 
+    b:HookScript("OnLeave", function(self) 
         if f.selectedSideTab == self.key then
             self.text:SetTextColor(1, 0.975, 0.85)
         else
@@ -457,7 +478,22 @@ local function CreateSideTab(parent, text, key, itemList)
     return b
 end
 -- Create a point for the tabs to attach to. Move all the tabs by moving this one frame
-f.sideTabFrame = CreateFrame("FRAME", nil, f)
+if S.UseNewBank() then
+    -- Hijack the default bank frame tab system
+    f.sideTabFrame = BankFrame.TabSystem
+    BankFrame:SetParent(f)
+    S.Utils.KillFrame(BankFrame)
+    S.Utils.KillFrame(BankPanel)
+    S.Utils.KillFrame(BankFrame.TabSystem)
+    S.Utils.KillFrame(BankFrame.TabSystem:GetTabButton(BankFrame.characterBankTabID))
+    S.Utils.KillFrame(BankFrame.TabSystem:GetTabButton(BankFrame.accountBankTabID))
+    BankFrame.SetShown = BankFrame.Show
+    BankFrame.Hide = BankFrame.Show
+    BankFrame:Show()
+    BankFrame.TabSystem.LayoutChildren = function(self) return 1, 1, false end
+else
+    f.sideTabFrame = CreateFrame("FRAME", nil, f)
+end
 f.sideTabFrame:SetFrameLevel(f:GetFrameLevel() - 10)
 -- Create the tabs
 if S.WoWVersion() == 1 then
@@ -469,9 +505,11 @@ if S.WoWVersion() == 1 then
     end)
 else
     CreateSideTab(f.sideTabFrame, S.Localize("TAB_CURRENCY"), "CURRENCY", S.CurrencyList)
-    CreateSideTab(f.sideTabFrame, S.Localize("TAB_BANK"), "BANK", S.BankItemList)
+    if not S.UseNewBank() then
+        CreateSideTab(f.sideTabFrame, S.Localize("TAB_BANK"), "BANK", S.BankItemList)
+    end
 
-    if S.WoWVersion() >= 6 then
+    if S.WoWVersion() >= 6 and not S.UseNewBank() then
         CreateSideTab(f.sideTabFrame, S.Localize("TAB_REAGENTS"), "REAGENTS", S.ReagentItemList)
     elseif S.WoWVersion() <= 3 then
         CreateSideTab(f.sideTabFrame, KEYRING, "KEYRING", S.KeyringItemList)
@@ -485,27 +523,31 @@ S.Utils.RunOnEvent(nil, "BankClosed", function()
     SelectSideTab(nil, true)
 end)
 
-function S.AddSideTab(text, key)
+function S.AddSideTab(text, key, button)
     local f = CreateFrame("FRAME", nil, S.primaryFrame.sideFrame.content)
     f:SetAllPoints()
-    local tab = CreateSideTab(S.primaryFrame.sideTabFrame, text, key, f)
+    local tab = CreateSideTab(S.primaryFrame.sideTabFrame, text, key, f, button)
     return tab, f
 end
 
 -- Showing and hiding of side tabs
 local function UpdateSideTabPositions()
     local lastVisibleTabIndex
+
     for i,v in ipairs(f.sideTabs) do
         if v:IsShown() then
+            v:ClearAllPoints()
             if not lastVisibleTabIndex then
-                v:SetPoint("BOTTOM")
+                v:SetPoint("BOTTOMRIGHT")
             else
                 if S.Skinning.GetSkin() == S.Skinning.ADDONSKINS then
-                    v:SetPoint("BOTTOM", f.sideTabs[lastVisibleTabIndex], "TOP", 0, 2)
+                    v:SetPoint("BOTTOMRIGHT", f.sideTabs[lastVisibleTabIndex], "TOPRIGHT", 0, 2)
                 else
-                    v:SetPoint("BOTTOM", f.sideTabs[lastVisibleTabIndex], "TOP", 0, -6)
+                    v:SetPoint("BOTTOMRIGHT", f.sideTabs[lastVisibleTabIndex], "TOPRIGHT", 0, -6)
                 end
             end
+            v:SetWidth(34)
+            UpdateSideTabHeight(v)
             lastVisibleTabIndex = i
         end
     end
@@ -545,6 +587,7 @@ function S.HideSideTab(key)
 end
 UpdateSideTabPositions()
 S.Utils.RunOnEvent(nil, "SettingChanged-skinning", UpdateSideTabPositions)
+f.sideTabFrame:HookScript("OnShow", UpdateSideTabPositions)
 
 
 

@@ -87,7 +87,7 @@ COLUMN_WEEKLY_QUANTITY	Quantity This Week	Quantity This Week	Quantité cette sem
 COLUMN_WEEKLY_QUANTITY_SHORT	#/Wk	#/Wk	#/Sem	#/Wo		#/주	#/周	#/週				#/Sem
 COLUMN_MAX_WEEKLY_QUANTITY	Max Per Week	Max Per Week	Maximum par semaine	Max Pro Woche		주당 최대	每周最多	每週最多		Maximo por semana		Máximo por semana
 COLUMN_MAX_WEEKLY_QUANTITY_SHORT	Max/Wk	Max/Wk	Maximum/Sem	Max/Wo		최대/주	最多/周	最多/週		Max/Sem		Máximo/Sem
-GROUP_HEADING_RECENTLY_UNEQUIPPED	Recently Unequipped	Recently Unequipped										
+GROUP_HEADING_RECENTLY_UNEQUIPPED	Recently Unequipped	Recently Unequipped				최근 벗어냄	最近未装备	最近未裝備				
 GROUPING_CATEGORY	Category	Category	Catégorie	Kategorie	Categorìa	카테고리	类别	類別	Категория	Categoría		Categoria
 GROUPING_TRACKED_CHECKED	Showing	Showing		Zeige		보임	显示	顯示				
 GROUPING_TRACKED_UNCHECKED	Not Showing	Not Showing		Versteckt		안보임	未显示	未顯示				
@@ -179,7 +179,7 @@ SUBFILTER_SUBTYPE_BATTLE_PET_ELEMENTAL	Elemental	Elemental	Elémentale	Elementar
 SUBFILTER_SUBTYPE_BATTLE_PET_BEAST	Beast	Beast	Bête	Biest	Bestiale	야수	野兽	野獸	Животное	Bestia	Bestia	Fera
 SUBFILTER_SUBTYPE_BATTLE_PET_WATER	Water	Water	Aquatique	Wasser	Acquatica	물	水栖	水棲	Водный	Agua	Agua	Água
 SUBFILTER_SUBTYPE_BATTLE_PET_MECHANICAL	Mechanical	Mechanical	Machine	Mechanisch	Meccanica	기계	机械	機械	Механизм	Mecánico	Mecánico	Meânico
-SUBFILTER_SUBTYPE_CONSUMABLE_BOMBS_AND_DEVICES	Bombs and Devices	Bombs and Devices	Bombes et dispositifs	Bomben und Geräte	Esplosivi e congegni	폭발물과 장치	爆破物与装置	爆裂物與裝置	Бомбы/устройства	Bombas y Dispositívos	Bombas y Dispositívos	Bombas e Dispositivos
+SUBFILTER_SUBTYPE_CONSUMABLE_BOMBS_AND_DEVICES	Bombs and Devices	Bombs and Devices	Bombes et dispositifs	Bomben und Geräte	Esplosivi e congegni	폭발물과 장치	爆炸物与装置	爆裂物與裝置	Бомбы/устройства	Bombas y Dispositívos	Bombas y Dispositívos	Bombas e Dispositivos
 SUBFILTER_SUBTYPE_CONSUMABLE_POTIONS	Potions	Potions	Potions	Tränke	Pozioni	물약	药水	藥水	Зелья	Pociones	Pociones	Poções
 SUBFILTER_SUBTYPE_CONSUMABLE_ELIXIRS	Elixirs	Elixirs	Elixires	Elixire	Elisir	비약	药剂	藥劑	Эликсиры	Elixires	Elixires	Elixires
 SUBFILTER_SUBTYPE_CONSUMABLE_FLASKS	Flasks	Flasks	Flacons	Flaschen	Tonico	영약	合剂	精煉藥劑	Настои	Vial	Vial	Frascos
@@ -317,7 +317,7 @@ SUBFILTER_TIME_MINUTES	Minutes	Minutes	Minutes	Minuten	Minuti	분	分钟	分鐘	
 SUBFILTER_TIME_MINUTES_SHORT	Mins	Mins	Mins	Min.	Min	분	分	分	мин.	Mins	Mins	Mins
 SUBFILTER_TIME_HOUR_SHORT	Hour	Hour	Heure	Stunde	Ore	시간	小时	小時	час	Hora	Hora	Hora
 SUBFILTER_TIME_HOURS	Hours	Hours	Heures	Stunden	Ore	시간	小时	小時	часов	Horas	Horas	Horas
-SUBFILTER_TIME_HOURS_SHORT	Hrs	Hrs	H	h	O	시간	小时	小時	ч.	Hrs	Hrs	Hrs
+SUBFILTER_TIME_HOURS_SHORT	Hrs	Hrs	H	Std.	O	시간	小时	小時	ч.	Hrs	Hrs	Hrs
 SUBFILTER_TIME_DAY_SHORT	Day	Day	Jour	Tag	Giorno	일	天	天	день	Día	Día	Dia
 SUBFILTER_TIME_DAYS	Days	Days	Jours	Tage	Giorni	일	天	天	дней	Días	Días	Dias
 SUBFILTER_TIME_DAYS_SHORT	Days	Days	Jours	Tage	Giorni	일	天	天	дн.	Días	Días	Dias
@@ -339,8 +339,8 @@ SUBFILTER_BINDING_ON_USE	Bind on Use	Bind on Use	Lié quand utilisé	Bei Benutzu
 SUBFILTER_BINDING_ON_USE_SHORT	Use	Use	Utilisé	Benutzen	Uso	사용	用绑	用綁	Исп.	Usar	Usar	Usar
 SUBFILTER_BINDING_SOULBOUND	Soulbound	Soulbound	Lié au compte	Seelengebunden	Vincolato	계정 귀속	灵魂绑定	靈魂綁定	Персональный	Ligado al alma	Ligado al alma	Vinculado
 SUBFILTER_BINDING_SOULBOUND_SHORT	Bound	Bound	Lié	Gebunden	Vincolato	계귀	绑定	綁定		Ligado	Ligado	Vinculado
-SUBFILTER_EXPANSION_WOW	World of Warcraft	World of Warcraft										
-SUBFILTER_EXPANSION_WOW_SHORT	WoW	WoW										
+SUBFILTER_EXPANSION_WOW	World of Warcraft	World of Warcraft		World of Warcraft		월드 오브 워크래프트						
+SUBFILTER_EXPANSION_WOW_SHORT	WoW	WoW				오리						
 SUBFILTER_EXPANSION_TBC	The Burning Crusade	The Burning Crusade	The Burning Crusade	The Burning Crusade	The Burning Crusade	불타는 성전	燃烧的远征	燃燒的遠征	The Burning Crusade	The Burning Crusade	The Burning Crusade	A Crusada Ardente
 SUBFILTER_EXPANSION_TBC_SHORT	TBC	TBC	TBC	TBC	TBC	불성	远征	遠征	TBC	TBC	TBC	TBC
 SUBFILTER_EXPANSION_WOTLK	Wrath of the Lich King	Wrath of the Lich King	Wrath of the Lich King	Wrath of the Lich King	Wrath of the Lich King	리치왕의 분노	巫妖王之怒	巫妖王之怒	Wrath of the Lich King	Wrath of the Lich King	Wrath of the Lich King	A Fúria do Lich Rei
@@ -383,8 +383,8 @@ CONFIG_SKIN_DESATURATE_CATEGORIES	Desaturate Unselected	Desaturate Unselected		U
 CONFIG_SKIN_CATEGORIES_POSITION_TOP	Top	Top	Haut	Oben		상단	顶	頂				Acima
 CONFIG_SKIN_CATEGORIES_POSITION_SIDE	Side	Side	Côté	Seite		옆	边	邊				Do lado
 CONFIG_FEATURES_PIN_NEW_ITEMS	Pin New Items	Pin New Items	Epingler les nouveaux objets	Neue Gegenstände anpinnen		새 아이템 강조	置顶新物品	置頂新物品				Fixar novos itens
-CONFIG_FEATURES_PIN_RECENTLY_UNEQUIPPED_ITEMS	Pin Recently Unequipped Items	Pin Recently Unequipped Items										
-CONFIG_FEATURES_PROTECT_FAVORITES	Prevent Selling Favorite Items	Prevent Selling Favourite Items					防止出售最爱的物品	防止出售最愛的物品				
+CONFIG_FEATURES_PIN_RECENTLY_UNEQUIPPED_ITEMS	Pin Recently Unequipped Items	Pin Recently Unequipped Items				최근 착용 해제한 아이템 고정	置顶最近未装备的物品	置頂最近未裝備的物品				
+CONFIG_FEATURES_PROTECT_FAVORITES	Prevent Selling Favorite Items	Prevent Selling Favourite Items				즐겨찾기한 아이템 판매 방지	防止出售最爱的物品	防止出售最愛的物品				
 CONFIG_APPEARANCE_SCALE	Scale	Scale	Echelle	Skalierung	Scala	크기 비율	缩放	縮放	Масштаб	Escala	Escala	Escala
 CONFIG_APPEARANCE_ICON_SIZE	Icon Size	Icon Size	Taille d'icône	Symbolgröße	Dimensione icona	아이콘 크기	图标尺寸	圖示尺寸	Размер значков	Tamaño del icono	Tamaño del icono	Tamanho de Icone
 CONFIG_APPEARANCE_ICON_SHAPE	Round Icons	Round Icons	Icônes rondes	Runde Symbole		동그란 아이콘	圆形图标	圓形圖標				
@@ -412,7 +412,7 @@ CONFIG_APPEARANCE_ALWAYS_USE_ICONS	Always Use Icons	Always Use Icons	Utiliser to
 CONFIG_APPEARANCE_SKINNING	Skin	Skin	Apparence	Aussehen		스킨	皮肤	皮膚				
 CONFIG_APPEARANCE_SKINNING_DEFAULT	Default	Default	Par défault	Standard		기본	默认	默認				Padrão
 CONFIG_APPEARANCE_SKINNING_CLEAN	Clean	Clean		Clean		깔끔함	简约	簡約				Limpa
-CONFIG_APPEARANCE_SKINNING_ADDONSKINS	AddOnSkins	AddOnSkins	AddOnSkins	AddOnSkins		애드온 스킨	AddonSkins	AddonSkins				
+CONFIG_APPEARANCE_SKINNING_ADDONSKINS	AddOnSkins	AddOnSkins	AddOnSkins	AddOnSkins		AddOnSkins	AddonSkins	AddonSkins				
 CONFIG_APPEARANCE_ELVUI_SKIN	ElvUI Skin	ElvUI Skin	Apparence ElvUI	ElvUI Skin	ElvUI Skin	ElvUI 스킨	ElvUI外观	ElvUI外觀	ElvUI Skin			Skin ElvUI
 CONFIG_BEHAVIOR_SCROLLING_HEADER	Scrolling	Scrolling	Défilement	Scrollen	Scorrimento	스크롤	滚动	捲動	Прокрутка			Rolamento
 CONFIG_BEHAVIOR_SCROLL_WHEEL_SPEED	Wheel Scroll Speed	Wheel Scroll Speed	Vitesse du bouton de défilement	Mausradgeschwindigkeit	Velocità di scorrimento della rotella	스크롤 속도	鼠标滚轮速度	滾輪捲動速度	Скорость прокрутки	Velocidad de la rueda de desplazamiento	Velocidad de la rueda de desplazamiento	Velocidade da roda do mouse
@@ -427,7 +427,7 @@ CONFIG_BEHAVIOR_PIN_NEW	Pin to Top	Pin to Top	Epingler en haut	Anpinnen	Metti in
 CONFIG_BEHAVIOR_TOOLTIP_HEADER	Tooltips	Tooltips	Infobulle	Tooltips	Tooltips	툴팁	提示资讯	提示資訊	Всплывающие подсказки			Tooltip
 CONFIG_BEHAVIOR_EXTENDED_TOOLTIPS	Extended Item Tooltips	Extended Item Tooltips	Info-bulles étendu des articles	Erweiterter Gegenstands Tooltip		아이템 툴팁 확장	详细物品提示	詳細物品提示				Ampliar dicas de itens
 CONFIG_BEHAVIOR_TOOLTIP_INFO	Info on Item Tooltips	Info on Item Tooltips	Informations sur les info-bulles des articles	Gegenstands Tooltip	Informazioni sui tooltip degli oggetti	툴팁에 정보 표시	物品提示统计资讯	物品提示統計資訊	Информация на подсказках о предмете	Info en el globo de ayuda		Informação no Tooltip
-CONFIG_BEHAVIOR_TOOLTIP_DELAY	Tooltip Delay	Tooltip Delay	Délai d'infobulle	Tooltip-Verzögerung	Ritardo dello tooltip	툴팁 등장 속도	提示延迟	工具提示延遲	Задержка подсказки	Retraso del Globo de Ayuda	Retraso del Globo de Ayuda	Atraso da janela de Dica
+CONFIG_BEHAVIOR_TOOLTIP_DELAY	Tooltip Delay	Tooltip Delay	Délai d'infobulle	Tooltip-Verzögerung	Ritardo dello tooltip	툴팁 표시 속도	提示延迟	工具提示延遲	Задержка подсказки	Retraso del Globo de Ayuda	Retraso del Globo de Ayuda	Atraso da janela de Dica
 CONFIG_BEHAVIOR_TOOLTIP_DELAY_SECOND	Second	Second	Seconde	Sekunden	Secondo	초	秒	秒	Секунда	Segundo	Segundo	Segundo
 CONFIG_BEHAVIOR_TOOLTIP_DELAY_SECONDS	Seconds	Seconds	Secondes	Sekunden	Secondi	초	秒	秒	Секунд	Segundos	Segundos	Segundos
 CONFIG_BEHAVIOR_ON_OPEN_HEADER	When Opening Bags	When Opening Bags	À l'ouverture des sacs	Wenn Tasche geöffnet wird	Quando si aprono i sacchetti	가방을 열었을 때	打开背包时	打開背包時	При открытии сумки			Quando abrir as bolsas
@@ -452,13 +452,13 @@ CONFIG_CATEGORIES_ICON	Icon	Icon	Icône	Symbol	Icona	아이콘	图标	圖示	З�
 CONFIG_CATEGORIES_FILTERS	Filters	Filters	Filtres	Filter	Filtri	필터	类别筛选	類別篩選	Фильтр	Filtros	Filtros	Filtros
 CONFIG_CATEGORIES_ADD	Add Category	Add Category	Ajouter Catégorie	Kategorie hinzufügen	Aggiungi categoria	분류 추가	新增类别	新增類別	Доб. категорию	Añadir Categoría	Añadir Categoría	Adicionar Categoria
 CONFIG_CATEGORIES_DEFAULT_NAME	New Category	New Category	Nouvelle Catégorie	Neue Kategorie	Nuova categoria	새 분류	新类别	新類別	Новая категория	Nueva Categoría	Nueva Categoría	Nova Categoria
-CONFIG_CATEGORIES_IMPORT	Import	Import					导入	匯入				
-CONFIG_CATEGORIES_IMPORT_INSTRUCTION	Paste text...	Paste text...					粘贴文本...	貼上文字...				
-CONFIG_CATEGORIES_IMPORT_TIP	Use Ctrl + V to paste the category data	Use Ctrl + V to paste the category data					使用 Ctrl + V 粘贴类别数据	使用 Ctrl + V 貼上類別資料				
-CONFIG_CATEGORIES_EXPORT	Export	Export					导出	匯出				
-CONFIG_CATEGORIES_EXPORT_TIP	Use Ctrl + C to copy the category data	Use Ctrl + C to copy the category data					使用 Ctrl + C 复制类别数据	使用 Ctrl + C 複製類別資料				
-CONFIG_CATEGORIES_INCLUDE	Include	Include					包括	包括				
-CONFIG_CATEGORIES_EXCLUDE	Exclude	Exclude					排除	排除				
+CONFIG_CATEGORIES_IMPORT	Import	Import				가져오기	导入	匯入				
+CONFIG_CATEGORIES_IMPORT_INSTRUCTION	Paste text...	Paste text...				문자열 붙여넣기...	粘贴文本...	貼上文字...				
+CONFIG_CATEGORIES_IMPORT_TIP	Use Ctrl + V to paste the category data	Use Ctrl + V to paste the category data				Ctrl + V를 통해 분류 데이터 붙여넣기	使用 Ctrl + V 粘贴类别数据	使用 Ctrl + V 貼上類別資料				
+CONFIG_CATEGORIES_EXPORT	Export	Export				내보내기	导出	匯出				
+CONFIG_CATEGORIES_EXPORT_TIP	Use Ctrl + C to copy the category data	Use Ctrl + C to copy the category data				Ctrl + V를 통해 분류 데이터 복사	使用 Ctrl + C 复制类别数据	使用 Ctrl + C 複製類別資料				
+CONFIG_CATEGORIES_INCLUDE	Include	Include				포함	包括	包括				
+CONFIG_CATEGORIES_EXCLUDE	Exclude	Exclude				제외	排除	排除				
 CONFIG_COLUMNS_COLUMN	Column	Column	Colonne	Spalte	Colonna	열	列	欄目	Столбец	Columna	Columna	Coluna
 CONFIG_COLUMNS_WIDTH	Width	Width	Largeur	Breite	Larghezza pannello laterale	넓이	宽度	寬度	Ширина	Ancho	Ancho	Largura
 CONFIG_COLUMNS_ENABLED	Enabled	Enabled	Activer	Aktiviert	Abilitato	활성화	启用	啟用	Вкл.	Activado	Activado	Habilitado
@@ -517,7 +517,7 @@ TOOLTIP_CONFIG_COMBINE_STACKS	Combine Stacks:\n|cffffffffMerges identical items 
 TOOLTIP_CONFIG_REMOVE_CATEGORY	Remove "%s"	Remove "%s"	Effacer "%s" ?	%s' entfernen		"%s" 삭제	移除 "%s"	移除 "%s"	Удалить "%s"	Borrar "%s"	Borrar "%s"	Remover "%s
 TOOLTIP_BUY_BANK_SLOT	Purchase Bag Slot	Purchase Bag Slot	Acheter un emplacement pour sac	Taschenfach kaufen		가방 칸 구입	购买背包格位	購買背包格位	Купить слот	Comprar Ranura de Bolsa	Comprar Ranura de Bolsa	Comprar Espaço de Bolsa
 TOOLTIP_EMPTY_BAG	< Right click to empty this bag >	< Right click to empty this bag >	< Clic droit pour vider ce sac>	< Rechtsklick um diese Tasche zu leeren >		< 우클릭해 가방 비우기 >	<右键点击清空此包>	<右鍵點擊清空此包>				
-DIALOG_VOID_STORAGE_DEPOSIT	|cffe2e2ddSorted automatically deposits items directly into your Void Storage\n\n|cffffffffThis action costs %s per item\n\n|cffffee00Are you sure?	|cffe2e2ddSorted automatically deposits items directly into your Void Storage\n\n|cffffffffThis action costs %s per item\n\n|cffffee00Are you sure?					|cffe2e2ddSorted 会自动将物品直接存入你的虚空银行\n\n|cffffffff此操作每件物品花费 %s\n\n|cffffee00你确定吗？	|cffe2e2ddSorted 會自動將物品直接存入你的虛空銀行\n\n|cffffffff此操作每件物品花費 %s\n\n|cffffee00你確定嗎？				
+DIALOG_VOID_STORAGE_DEPOSIT	|cffe2e2ddSorted automatically deposits items directly into your Void Storage\n\n|cffffffffThis action costs %s per item\n\n|cffffee00Are you sure?	|cffe2e2ddSorted automatically deposits items directly into your Void Storage\n\n|cffffffffThis action costs %s per item\n\n|cffffee00Are you sure?				|cffe2e2ddSorted가 자동으로 당신의 아이템을 공허 보관소에 옮깁니다\n\n|cffffffff이를 위해 아이템마다 %s의 비용이 듭니다\n\n|cffffee00확인하셨나요?	|cffe2e2ddSorted 会自动将物品直接存入你的虚空银行\n\n|cffffffff此操作每件物品花费 %s\n\n|cffffee00你确定吗？	|cffe2e2ddSorted 會自動將物品直接存入你的虛空銀行\n\n|cffffffff此操作每件物品花費 %s\n\n|cffffee00你確定嗎？				
 DIALOG_DELETE_CHARACTER_DATA	You will no longer be able to preview %s's items until you next play that character	You will no longer be able to preview %s's items until you next play that character	Vous ne pourrez plus prévisualiser les éléments de %s\njusqu'à ce que vous jouiez de nouveau avec ce personnage.	Du wirst nicht länger Gegenstände von %s sehen können bis Du diesen Charakter wieder gespielt hast		해당 캐릭터를 다시 플레이하기 전까지 %s의 아이템을 확인할 수 없을 것입니다.	在您下次玩此角色前，您将无法预览 %s 的物品	在你下次玩此角色前你再也無法預覽 %s的物品	Вы больше не сможете просматривать предметы, пока не сыграете этим персонажем в следующий раз.	No podrás ver la vista previa de los objetos de %s hasta que vuelvas a jugar con ese personaje	No podrás ver la vista previa de los objetos de %s hasta que vuelvas a jugar con ese personaje	Você não poderá mais previsualizar os itens de %s Até você logar nele novamente
 DIALOG_DELETE_SETTINGS_PROFILE	Are you sure you want to delete the settings for profile '%s'?	Are you sure you want to delete the settings for profile '%s'?	Voulez-vous vraiment supprimer  la configuration du profil  '%s'  ?	Bist Du sicher, dass du die Einstellungen für Profil '%s' löschen willst?		%s' 프로필 설정을 정말로 삭제하시겠습니까?	您确定要删除设定档'%s'的配置吗？	您確定想要刪除設定檔 '%s'的配置嗎？	Вы действительно хотите удалить настройки для профиля '%s'?	¿Estás seguro que quiéres eliminar las opciones del perfil de '%s'?	¿Estás seguro que quiéres eliminar las opciones del perfil de '%s'?	Tem certeza de que quer elimitar todas as configurações do perfil '%s'?
 DIALOG_BUTTON_ACCEPT	Accept	Accept	Accepter	Annehmen		승락	接受	接受	Принять	Aceptar	Aceptar	Aceitar

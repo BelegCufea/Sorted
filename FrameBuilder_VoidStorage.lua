@@ -1,7 +1,7 @@
 local _, S = ...
 local pairs, ipairs, string, type, time = pairs, ipairs, string, type, time
 
-if S.WoWVersion() >= 4 then
+if S.WoWVersion() >= 4 and CanUseVoidStorage then
 
     --S.VoidStorage = {}
 

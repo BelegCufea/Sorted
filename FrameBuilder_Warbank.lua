@@ -3,7 +3,12 @@ local pairs, ipairs, string, type, time = pairs, ipairs, string, type, time
 
 if S.WoWVersion() >= 11 then
     -- Side tab
-    local sideTab, f = S.AddSideTab(REPUTATION_SORT_TYPE_ACCOUNT, "WARBANK")
+    local sideTab, f
+    if S.UseNewBank() then
+        sideTab, f = S.AddSideTab(REPUTATION_SORT_TYPE_ACCOUNT, "WARBANK", BankFrame.TabSystem:GetTabButton(BankFrame.accountBankTabID))
+    else
+        sideTab, f = S.AddSideTab(REPUTATION_SORT_TYPE_ACCOUNT, "WARBANK")
+    end
 
     -- Item list
     f.itemList = S.CreateItemList(f, "ACCOUNT", 500, "ContainerFrameItemButtonTemplate")
@@ -81,17 +86,22 @@ if S.WoWVersion() >= 11 then
             if button == "RightButton" then
                 self:SetChecked(not self:GetChecked())
                 if S.IsBankOpened() then
-                    if f.tabsSettingsMenu:GetSelectedTabID() == self.tabID + 12 then
+                    local accountBankTabID = self.tabID + Enum.BagIndex.AccountBankTab_1 - 1
+                    if f.tabsSettingsMenu:GetSelectedTabID() == accountBankTabID then
                         self:SetChecked(false)
                         f.tabsSettingsMenu:Hide()
                     else
-                        AccountBankPanel:SelectTab(self.tabID + 12)
+                        if AccountBankPanel then
+                            AccountBankPanel:SelectTab(accountBankTabID)
+                        else
+                            BankPanel:SelectTab(accountBankTabID)
+                        end
                         f.selectedTabSettings = self.tabID
                         if not f.tabsSettingsMenu:IsShown() then
-                            f.tabsSettingsMenu:TriggerEvent(BankPanelTabSettingsMenuMixin.Event.OpenTabSettingsRequested, self.tabID + 12)
+                            f.tabsSettingsMenu:TriggerEvent(BankPanelTabSettingsMenuMixin.Event.OpenTabSettingsRequested, accountBankTabID)
                             f.tabsSettingsMenu:ClearAllPoints()
                         else
-                            f.tabsSettingsMenu:SetSelectedTab(self.tabID + 12)
+                            f.tabsSettingsMenu:SetSelectedTab(accountBankTabID)
                         end
                         f.tabsSettingsMenu:SetPoint("BOTTOM", self, "TOP")
                     end
@@ -141,7 +151,7 @@ if S.WoWVersion() >= 11 then
             f.middleFrame:SetPoint("LEFT", f.tabsFrame, "RIGHT")
         else
             self.buyTabButton:Show()
-            self.buyTabButton.text:SetText(S.Utils.FormatValueString(C_Bank.FetchNextPurchasableBankTabCost(2)))
+            self.buyTabButton.text:SetText(S.Utils.FormatValueString(S.Utils.FetchNextPurchasableBankTabData(2).tabCost))
             f.middleFrame:SetPoint("LEFT", self.buyTabButton.text, "RIGHT")
         end
     end
@@ -150,11 +160,17 @@ if S.WoWVersion() >= 11 then
     f.tabsFrame:RegisterEvent("PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED")
     f.tabsFrame:SetScript("OnEvent", f.tabsFrame.Update)
 
-    local b = AccountBankPanel.PurchasePrompt.TabCostFrame.PurchaseButton
-    for k,v in pairs(b) do
-        if type(v) == "table" and v.Hide then
-            v:Hide()
-            v:ClearAllPoints()
+    local b
+    if S.UseNewBank() then
+        b = CreateFrame("BUTTON", nil, f.tabsFrame, "BankPanelPurchaseButtonScriptTemplate")
+        b:SetAttribute("overrideBankType", Enum.BankType.Account)
+    else
+        b = AccountBankPanel.PurchasePrompt.TabCostFrame.PurchaseButton
+        for k,v in pairs(b) do
+            if type(v) == "table" and v.Hide then
+                v:Hide()
+                v:ClearAllPoints()
+            end
         end
     end
     f.tabsFrame.buyTabButton = b

@@ -37,7 +37,7 @@ local function UpdateEntry(self)
         UpdateLocked(self)
 
         self:UpdateIsCoolingDown()
-        self:SetID(self.bag)
+        self.button:GetParent():SetID(self.bag)
         self.button:SetID(self.slot)
         self.button.bag = self.bag
         self.button.slot = self.slot
@@ -303,6 +303,10 @@ function S.CreateItemEntry(list, template)
     self.button.OnItemEntryButtonEnter = Button_OnEnter
     if S.WoWVersion() <= 4 then 
         self.button.GetBagID = Button_GetBagID -- Replacing this in Retail seems to cause the "Sorted was blocked from an action only available to the Blizzard UI" error
+    end
+    if list.type == "REAGENT" then
+        self.button.SetBagID = ContainerFrameItemButtonMixin.SetBagID
+        self.button.GetBagID = ContainerFrameItemButtonMixin.GetBagID
     end
     self.button.IsReadable = Button_IsReadable
     self.button.HasItem = Button_HasItem

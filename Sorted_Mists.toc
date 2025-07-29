@@ -1,5 +1,5 @@
-## Interface: 110200
-## Title: |A:::|a|TInterface\Addons\Sorted\Textures\Addon-Text:24:96|t
+## Interface: 50500
+## Title: |A:::|a|TInterface\Addons\Sorted\Textures\Title:24:96|t
 ## Notes: Modern bag interface with efficient searching and filters.
 ## Notes-frFR: Interface de Sac moderne avec un système de recherche et de filtre efficace.
 ## Notes-deDE: Moderne Taschendarstellung mit effzienter Suche und Filtern.
@@ -11,7 +11,7 @@
 ## Notes-ptBR: Uma bolsa com interface moderana, com funções eficientes de filtros e procura.
 ## Version: 2.4.2
 ## Author: Daft Vader
-## SavedVariables: Sorted_Data, Sorted_AccountData, Sorted_SettingsProfiles, Sorted_DefaultSettingsProfile
+## SavedVariables: Sorted_Data, Sorted_SettingsProfiles, Sorted_DefaultSettingsProfile
 ## DefaultState: enabled
 ## AddonCompartmentFunc: Sorted_OpenSettings
 ## IconTexture: Interface\AddOns\Sorted\Textures\Addon-Icon
@@ -41,14 +41,10 @@ List.lua
 List_Items.lua
 List_Guild.lua
 List_Currencies.lua
-List_VoidStorage.lua
 
 FrameBuilder.lua
-FrameBuilder_Bank.lua
-FrameBuilder_Warbank.lua
 FrameBuilder_GuildBank.lua
 FrameBuilder_CurrencyTracker.lua
-FrameBuilder_VoidStorage.lua
 SettingsProfiles.lua
 SettingsFrame.lua
 SettingsFrame_Categories.lua

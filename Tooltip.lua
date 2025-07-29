@@ -190,7 +190,7 @@ local function QueryItemCounts(i, itemID, GUIDs, tooltipID)
     end
 
     local reagentCount = 0
-    if S.WoWVersion() >= 6 then
+    if S.WoWVersion() >= 6 and not S.UseNewBank() then
         for _, itemData in pairs(data.containers[REAGENTBANK_CONTAINER]) do
             if itemData.itemID == itemID and itemData.count then
                 bagCount = bagCount + itemData.count

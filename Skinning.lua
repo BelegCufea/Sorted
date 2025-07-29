@@ -54,12 +54,12 @@ function S.Skinning.SkinDefault()
     f.minimiseButton.clean = false
     f.minimiseButton:Update()]]
 
-    f.wowButton:SetSize(29, 30)
+    --[[f.wowButton:SetSize(29, 30)
     f.wowButton:SetPoint("CENTER", f, "TOPRIGHT", -42, -12)
     f.wowButton:SetNormalTexture("Interface\\Addons\\Sorted\\Textures\\wow-button")
     f.wowButton:SetHighlightTexture("Interface\\Addons\\Sorted\\Textures\\wow-button")
     f.wowButton:GetHighlightTexture():SetTexCoord(texSizeX, texSizeX * 2, 0, texSizeY)
-    f.wowButton:SetPushedTexture("Interface\\Addons\\Sorted\\Textures\\wow-button")
+    f.wowButton:SetPushedTexture("Interface\\Addons\\Sorted\\Textures\\wow-button")]]
 
     f.settingsButton:SetSize(40, 40)
     f.settingsButton:SetPoint("CENTER", f, "TOPLEFT", 21, -6)
@@ -111,12 +111,12 @@ function S.Skinning.SkinClean()
     f.minimiseButton.clean = true
     f.minimiseButton:Update()]]
 
-    f.wowButton:SetSize(24, 24)
+    --[[f.wowButton:SetSize(24, 24)
     f.wowButton:SetPoint("CENTER", f, "TOPRIGHT", -38, -12)
     f.wowButton:SetNormalTexture("Interface\\Addons\\Sorted\\Textures\\wow-button-Clean")
     f.wowButton:SetHighlightTexture("Interface\\Addons\\Sorted\\Textures\\wow-button-Clean")
     f.wowButton:GetHighlightTexture():SetTexCoord(0, texSizeX, 0, texSizeY)
-    f.wowButton:SetPushedTexture("Interface\\Addons\\Sorted\\Textures\\wow-button-Clean")
+    f.wowButton:SetPushedTexture("Interface\\Addons\\Sorted\\Textures\\wow-button-Clean")]]
 
     f.settingsButton:SetSize(20, 20)
     f.settingsButton:SetPoint("CENTER", f, "TOPLEFT", 12, -12)
@@ -205,12 +205,12 @@ eventHandlerFrame:SetScript("OnEvent", function(self)
         S.AS:SkinButton(f.head.characterSelectDropdown)
         S.AS:SkinButton(f.head.equipSetDropdown)
 
-        f.wowButton:SetSize(24, 24)
+        --[[f.wowButton:SetSize(24, 24)
         f.wowButton:SetPoint("CENTER", f, "TOPRIGHT", -38, -12)
         f.wowButton:SetNormalTexture("Interface\\Addons\\Sorted\\Textures\\wow-button-Clean")
         f.wowButton:SetHighlightTexture("Interface\\Addons\\Sorted\\Textures\\wow-button-Clean")
         f.wowButton:GetHighlightTexture():SetTexCoord(0, texSizeX, 0, texSizeY)
-        f.wowButton:SetPushedTexture("Interface\\Addons\\Sorted\\Textures\\wow-button-Clean")
+        f.wowButton:SetPushedTexture("Interface\\Addons\\Sorted\\Textures\\wow-button-Clean")]]
 
         S.AS:SkinButton(f.settingsButton)
         f.settingsButton:ClearAllPoints()

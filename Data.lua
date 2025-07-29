@@ -153,6 +153,22 @@ local function InitialiseData()
         sortedData[playerGUID].inventoryItems = {}
     end
     sortedData[playerGUID].recentlyUnequippedItems = {}
+
+    -- Update to 11.2.0
+    if S.UseNewBank() then
+        for GUID, data in pairs(sortedData) do
+            if not data.useNewBank then
+                data.useNewBank = true
+                data.bankNotCached = true
+                data.bankTabData = {}
+                for container,_ in pairs(data.containers) do
+                    if container > NUM_BAG_SLOTS + NUM_REAGENTBAG_SLOTS then
+                        data.containers[container] = nil
+                    end
+                end
+            end
+        end
+    end
 end
 -- Updates any info available on login
 local function UpdatePlayerData()
@@ -164,7 +180,7 @@ local function UpdatePlayerData()
     playerData.faction = UnitFactionGroup("player")
     playerData.realm = GetRealmName()
     _, playerData.class = UnitClass("player")
-    if S.WoWVersion() >= 6 and not IsReagentBankUnlocked() then
+    if S.WoWVersion() >= 6 and not S.UseNewBank() and not IsReagentBankUnlocked() then
         playerData.reagentNotUnlocked = true
     else
         playerData.reagentNotUnlocked = nil
@@ -430,13 +446,15 @@ local function UpdateBagContents(container)
             end
         end
         -- Container buttons
-        for slotID = 1, NUM_BANKBAGSLOTS do
-            S.Data.UpdateItem(-4, slotID)
+        if not S.UseNewBank() then
+            for slotID = 1, NUM_BANKBAGSLOTS do
+                S.Data.UpdateItem(-4, slotID)
+            end
         end
     end
 
     -- Reagent bank
-    if S.WoWVersion() >= 6 and S.IsBankOpened() and IsReagentBankUnlocked() then
+    if S.WoWVersion() >= 6 and not S.UseNewBank() and S.IsBankOpened() and IsReagentBankUnlocked() then
         GetData(playerGUID).reagentNotUnlocked = nil
         if not container or REAGENTBANK_CONTAINER == container then
             for slotID = 1, 98 do
@@ -472,18 +490,57 @@ local function UpdateBagContents(container)
         end
     end
     
-    -- Update number of slots
+    -- Update equipped bags
     for k, bagID in pairs(S.Utils.ContainersOfType("ALL")) do
         if S.IsBankOpened() or not (S.Utils.ContainerIsType(bagID, "BANK") or S.Utils.ContainerIsType(bagID, "REAGENT") or S.Utils.ContainerIsType(bagID, "ACCOUNT")) then
+
+            local itemName, _, itemRarity
+            --New bank
+            if S.UseNewBank() and bagID >= Enum.BagIndex.CharacterBankTab_1 and bagID <= Enum.BagIndex.CharacterBankTab_6 then
+                if S.GetData().containerNumSlots[bagID] and S.GetData().containerNumSlots[bagID].numSlots > 0 then
+                    itemName, itemRarity = S.GetData().bankTabData[bagID - Enum.BagIndex.CharacterBankTab_1 + 1].name, 1
+                else
+                    itemName, itemRarity = nil, nil
+                end
+            -- Bags
+            elseif bagID ~= BANK_CONTAINER and bagID ~= BACKPACK_CONTAINER and bagID ~= REAGENTBANK_CONTAINER and bagID ~= KEYRING_CONTAINER and not S.Utils.ContainerIsType(bagID, "ACCOUNT") then
+                local invID = ContainerIDToInventoryID(bagID)
+                local itemLink = GetInventoryItemLink("player", invID)
+                if itemLink then
+                    itemName, _, itemRarity = GetItemInfo(itemLink)
+                end
+            -- Other containers
+            else
+                if bagID == BACKPACK_CONTAINER then
+                    itemName, itemRarity = BACKPACK_TOOLTIP, 1
+                elseif bagID == BANK_CONTAINER then
+                    itemName, itemRarity = BANK, 1
+                elseif bagID == REAGENTBANK_CONTAINER then
+                    itemName, itemRarity = REAGENT_BANK, 1
+                elseif bagID == KEYRING_CONTAINER then
+                    itemName, itemRarity = KEYRING, 1
+                elseif S.Utils.ContainerIsType(bagID, "ACCOUNT") then
+                    if Sorted_AccountData.containerNumSlots[bagID] and Sorted_AccountData.containerNumSlots[bagID].numSlots > 0 then
+                        itemName, itemRarity = Sorted_AccountData.bankTabData[bagID - Enum.BagIndex.AccountBankTab_1 + 1].name, 1
+                    else
+                        itemName, itemRarity = nil, nil
+                    end
+                end
+            end
+
             if S.Utils.ContainerIsType(bagID, "ACCOUNT") then
                 Sorted_AccountData.containerNumSlots[bagID] = {
                     ["numSlots"] = S.Utils.GetContainerNumSlots(bagID),
-                    ["numFreeSlots"] = S.Utils.GetContainerNumFreeSlots(bagID)
+                    ["numFreeSlots"] = S.Utils.GetContainerNumFreeSlots(bagID),
+                    ["itemName"] = itemName,
+                    ["itemRarity"] = itemRarity
                 }
             else
                 sortedData[playerGUID].containerNumSlots[bagID] = {
                     ["numSlots"] = S.Utils.GetContainerNumSlots(bagID),
-                    ["numFreeSlots"] = S.Utils.GetContainerNumFreeSlots(bagID)
+                    ["numFreeSlots"] = S.Utils.GetContainerNumFreeSlots(bagID),
+                    ["itemName"] = itemName,
+                    ["itemRarity"] = itemRarity
                 }
             end
         end
@@ -722,7 +779,7 @@ local function OnDataAvailable(bag, slot, inventory, guild, void)
 
                 -- Mythic Keystones
                 if S.WoWVersion() >= 7 and self.itemID and C_Item.IsItemKeystoneByID(self.itemID) then -- Mythic Keystone
-                    self.minLevel = 60
+                    self.minLevel = 80
                     self.value = 0
                     self.classID = Enum.ItemClass.Miscellaneous
                     self.subClassID = Enum.ItemMiscellaneousSubclass.Reagent
@@ -925,9 +982,16 @@ function S.Data.GetNumSlots(type, guid)
     return data[type:lower().."UsedSlots"], data[type:lower().."NumSlots"]
 end
 
+-- BANK FUNCTIONS
+function S.Data.UpdateBankTabs()
+    local bankTabData = C_Bank.FetchPurchasedBankTabData(Enum.BankType.Character)
+    S.Utils.CopyTable(bankTabData, GetData(playerGUID).bankTabData)
+    GetData(playerGUID).numBankTabs = C_Bank.FetchNumPurchasedBankTabs(Enum.BankType.Character)
+    S.Utils.TriggerEvent("BankTabsUpdated")
+end
 -- ACCOUNT BANK FUNCTIONS
 function S.Data.UpdateAccountBankTabs()
-    local bankTabData = C_Bank.FetchPurchasedBankTabData(2)
+    local bankTabData = C_Bank.FetchPurchasedBankTabData(Enum.BankType.Account)
     S.Utils.CopyTable(bankTabData, Sorted_AccountData.bankTabData)
     S.Utils.TriggerEvent("BankTabsUpdated")
 end
@@ -1351,6 +1415,9 @@ local function BankFrameOpenedDelayed()
     if bankOpen then
         UpdateBagContents()
         if S.WoWVersion() >= 11 then
+            if S.UseNewBank() then
+                S.Data.UpdateBankTabs()
+            end
             S.Data.UpdateAccountBankTabs()
         end
         S.Utils.TriggerEvent("BankOpened")
@@ -1373,13 +1440,15 @@ eventHandlerFrame:RegisterEvent("GUILDBANKBAGSLOTS_CHANGED")
 if S.WoWVersion() >= 3 then
     eventHandlerFrame:RegisterEvent("EQUIPMENT_SETS_CHANGED")
 end
-if S.WoWVersion() >= 6 then
+if S.WoWVersion() >= 6 and not S.UseNewBank() then
     eventHandlerFrame:RegisterEvent("REAGENTBANK_PURCHASED")
 end
 eventHandlerFrame:RegisterEvent("PLAYER_GUILD_UPDATE")
 eventHandlerFrame:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
-eventHandlerFrame:RegisterEvent("VOID_STORAGE_CONTENTS_UPDATE")
-eventHandlerFrame:RegisterEvent("VOID_TRANSFER_DONE")
+if not S.UseNewBank() then
+    eventHandlerFrame:RegisterEvent("VOID_STORAGE_CONTENTS_UPDATE")
+    eventHandlerFrame:RegisterEvent("VOID_TRANSFER_DONE")
+end
 eventHandlerFrame:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
 eventHandlerFrame:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE")
 eventHandlerFrame:SetScript("OnEvent", function(self, event, param1, param2, param3)
@@ -1441,7 +1510,11 @@ eventHandlerFrame:SetScript("OnEvent", function(self, event, param1, param2, par
         bankOpen = false
         S.Utils.TriggerEvent("BankClosed")
     elseif event == "BANK_TAB_SETTINGS_UPDATED" then
+        if S.UseNewBank() then
+            S.Data.UpdateBankTabs()
+        end
         S.Data.UpdateAccountBankTabs()
+        UpdateBagContents()
     elseif event == "EQUIPMENT_SETS_CHANGED" then
         UpdateEquipmentSets()
     elseif event == "REAGENTBANK_PURCHASED" then
