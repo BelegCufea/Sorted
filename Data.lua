@@ -1413,13 +1413,13 @@ end)
 
 local function BankFrameOpenedDelayed()
     if bankOpen then
-        UpdateBagContents()
         if S.WoWVersion() >= 11 then
             if S.UseNewBank() then
                 S.Data.UpdateBankTabs()
             end
             S.Data.UpdateAccountBankTabs()
         end
+        UpdateBagContents()
         S.Utils.TriggerEvent("BankOpened")
     end
 end
