@@ -4,11 +4,7 @@ local pairs, ipairs, string, type, time = pairs, ipairs, string, type, time
 if S.WoWVersion() >= 11 then
     -- Side tab
     local sideTab, f
-    if S.UseNewBank() then
-        sideTab, f = S.AddSideTab(REPUTATION_SORT_TYPE_ACCOUNT, "WARBANK", BankFrame.TabSystem:GetTabButton(BankFrame.accountBankTabID))
-    else
-        sideTab, f = S.AddSideTab(REPUTATION_SORT_TYPE_ACCOUNT, "WARBANK")
-    end
+    sideTab, f = S.AddSideTab(REPUTATION_SORT_TYPE_ACCOUNT, "WARBANK")
 
     -- Item list
     f.itemList = S.CreateItemList(f, "ACCOUNT", 500, "ContainerFrameItemButtonTemplate")
