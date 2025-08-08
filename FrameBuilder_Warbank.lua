@@ -4,11 +4,11 @@ local pairs, ipairs, string, type, time = pairs, ipairs, string, type, time
 if S.WoWVersion() >= 11 then
     -- Side tab
     local sideTab, f
-    --if S.UseNewBank() then
-    --    sideTab, f = S.AddSideTab(REPUTATION_SORT_TYPE_ACCOUNT, "WARBANK", BankFrame.TabSystem:GetTabButton(BankFrame.accountBankTabID))
-    --else
+    if S.UseNewBank() then
+        sideTab, f = S.AddSideTab(REPUTATION_SORT_TYPE_ACCOUNT, "WARBANK", BankFrame.TabSystem:GetTabButton(BankFrame.accountBankTabID))
+    else
         sideTab, f = S.AddSideTab(REPUTATION_SORT_TYPE_ACCOUNT, "WARBANK")
-    --end
+    end
 
     -- Item list
     f.itemList = S.CreateItemList(f, "ACCOUNT", 500, "ContainerFrameItemButtonTemplate")
@@ -36,25 +36,22 @@ if S.WoWVersion() >= 11 then
     S.Utils.RunOnEvent(f.tabsSettingsMenu, "BankClosed", f.tabsSettingsMenu.Hide)
 
     -- Override blizz functions
-    if S.UseNewBank() then
-        function f.tabsSettingsMenu.GetBankPanel()
+    function f.tabsSettingsMenu.GetBankPanel()
         return {
             GetTabData = function(tabID)
                 return Sorted_AccountData.bankTabData[f.selectedTabSettings]
             end
         }
-        end
-    else
-        function f.tabsSettingsMenu:GetSelectedTabData()
-            return Sorted_AccountData.bankTabData[f.selectedTabSettings]
-        end
-        function f.tabsSettingsMenu:GetBankFrame()
-            return f
-        end
-        f.selectedTabSettings = 1
-        function f:GetTabData(selectedTabID)
-            return Sorted_AccountData.bankTabData[f.selectedTabSettings]
-        end
+    end
+    function f.tabsSettingsMenu:GetSelectedTabData()
+        return Sorted_AccountData.bankTabData[f.selectedTabSettings]
+    end
+    function f.tabsSettingsMenu:GetBankFrame()
+        return f
+    end
+    f.selectedTabSettings = 1
+    function f:GetTabData(selectedTabID)
+        return Sorted_AccountData.bankTabData[f.selectedTabSettings]
     end
 
 

@@ -521,7 +521,12 @@ local function UpdateBagContents(container)
                     itemName, itemRarity = KEYRING, 1
                 elseif S.Utils.ContainerIsType(bagID, "ACCOUNT") then
                     if Sorted_AccountData.containerNumSlots[bagID] and Sorted_AccountData.containerNumSlots[bagID].numSlots > 0 then
-                        itemName, itemRarity = Sorted_AccountData.bankTabData[bagID - Enum.BagIndex.AccountBankTab_1 + 1].name, 1
+                        local bankTabData = Sorted_AccountData.bankTabData[bagID - Enum.BagIndex.AccountBankTab_1 + 1]
+                        if bankTabData then
+                            itemName, itemRarity = Sorted_AccountData.name, 1
+                        else
+                            itemName, itemRarity = nil, nil
+                        end
                     else
                         itemName, itemRarity = nil, nil
                     end
@@ -769,8 +774,16 @@ local function OnDataAvailable(bag, slot, inventory, guild, void)
                     self.speciesID, self.level, self.quality, _, _, _, self.speciesName = BattlePetToolTip_UnpackBattlePetLink(self.link)
                     self.speciesName = self.speciesName:gsub("[%[%]]", "") -- Remove square brackets around name
                     self.effectiveILvl = self.level
+                elseif not self.effectiveILvl then
+                    -- Blizz seemed to break functionality for pet cages in the guild bank at some point
+                    -- Get the item info the standard way
+                    self.name, _, self.quality, self.level, self.minLevel, _, _, self.stackCount, _,
+                    _, self.value, self.classID, self.subClassID, self.bindType, self.expacID = GetItemInfo(self.link)
+                    self.effectiveILvl = self.level
                 end
-                self.name = string.format(S.Localize("ITEM_PET_CAGED"), self.speciesName)
+                if self.speciesName then
+                    self.name = string.format(S.Localize("ITEM_PET_CAGED"), self.speciesName)
+                end
             else
                 self.speciesName, self.speciesID, self.cageName = nil, nil, nil
                 if S.WoWVersion() >= 5 then

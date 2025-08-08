@@ -4,8 +4,7 @@ local pairs, ipairs, string, type, time = pairs, ipairs, string, type, time
 -- The War Within 11.2 Bank
 if S.WoWVersion() >= 11 and S.UseNewBank() then
     -- Side tab
-    --local sideTab, f = S.AddSideTab(BANK, "BANK", BankFrame.TabSystem:GetTabButton(BankFrame.characterBankTabID))
-    local sideTab, f = S.AddSideTab(BANK, "BANK")
+    local sideTab, f = S.AddSideTab(BANK, "BANK", BankFrame.TabSystem:GetTabButton(BankFrame.characterBankTabID))
 
     -- Item list
     f.itemList = S.CreateItemList(f, "BANK", 500, "ContainerFrameItemButtonTemplate")
@@ -33,25 +32,23 @@ if S.WoWVersion() >= 11 and S.UseNewBank() then
     S.Utils.RunOnEvent(f.tabsSettingsMenu, "BankClosed", f.tabsSettingsMenu.Hide)
 
     -- Override blizz functions
-    -- function f.tabsSettingsMenu:GetSelectedTabData()
-    --     return S.GetData(UnitGUID("player")).bankTabData[f.selectedTabSettings]
-    -- end
-    -- function f.tabsSettingsMenu:GetBankFrame()
-    --     return f
-    -- end
-    -- f.selectedTabSettings = 1
-    -- function f:GetTabData(selectedTabID)
-    --     return S.GetData(UnitGUID("player")).bankTabData[f.selectedTabSettings]
-    -- end
-    -- f.selectedTabSettings = 1
     function f.tabsSettingsMenu.GetBankPanel()
-      return {
-        GetTabData = function(tabID)
-            return Sorted_Data[UnitGUID("player")].bankTabData[f.selectedTabSettings]
-        end
-      }
+        return {
+            GetTabData = function(tabID)
+                return S.GetData(UnitGUID("player")).bankTabData[f.selectedTabSettings]
+            end
+        }
     end
-
+    function f.tabsSettingsMenu:GetSelectedTabData()
+        return S.GetData(UnitGUID("player")).bankTabData[f.selectedTabSettings]
+    end
+    function f.tabsSettingsMenu:GetBankFrame()
+        return f
+    end
+    f.selectedTabSettings = 1
+    function f:GetTabData(selectedTabID)
+        return S.GetData(UnitGUID("player")).bankTabData[f.selectedTabSettings]
+    end
 
 
     f.tabs = {}

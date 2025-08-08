@@ -175,7 +175,7 @@ f.minimiseButton:Update()]]
 
 
 local texSizeX, texSizeY = 0.296875, 0.3125
-f.wowButton = CreateFrame("BUTTON", nil, f)
+--[[f.wowButton = CreateFrame("BUTTON", nil, f)
 f.wowButton:SetNormalTexture("Interface\\Addons\\Sorted\\Textures\\wow-button")
 f.wowButton:SetHighlightTexture("Interface\\Addons\\Sorted\\Textures\\wow-button")
 f.wowButton:SetPushedTexture("Interface\\Addons\\Sorted\\Textures\\wow-button")
@@ -189,7 +189,7 @@ f.wowButton:SetScript("OnClick", function(self, button, down)
     S.Utils.ResurrectBlizzBags()
     CloseAllBags()
     OpenAllBags()
-end)
+end)]]
 
 
 
@@ -478,22 +478,22 @@ local function CreateSideTab(parent, text, key, itemList, button)
     return b
 end
 -- Create a point for the tabs to attach to. Move all the tabs by moving this one frame
--- if S.UseNewBank() then
---     -- Hijack the default bank frame tab system
---     f.sideTabFrame = BankFrame.TabSystem
---     BankFrame:SetParent(f)
---     S.Utils.KillFrame(BankFrame)
---     S.Utils.KillFrame(BankPanel)
---     S.Utils.KillFrame(BankFrame.TabSystem)
---     S.Utils.KillFrame(BankFrame.TabSystem:GetTabButton(BankFrame.characterBankTabID))
---     S.Utils.KillFrame(BankFrame.TabSystem:GetTabButton(BankFrame.accountBankTabID))
---     BankFrame.SetShown = BankFrame.Show
---     BankFrame.Hide = BankFrame.Show
---     BankFrame:Show()
---     BankFrame.TabSystem.LayoutChildren = function(self) return 1, 1, false end
--- else
-f.sideTabFrame = CreateFrame("FRAME", nil, f)
---end
+if S.UseNewBank() then
+    -- Hijack the default bank frame tab system
+    f.sideTabFrame = BankFrame.TabSystem
+    BankFrame:SetParent(f)
+    S.Utils.KillFrame(BankFrame)
+    S.Utils.KillFrame(BankPanel)
+    S.Utils.KillFrame(BankFrame.TabSystem)
+    S.Utils.KillFrame(BankFrame.TabSystem:GetTabButton(BankFrame.characterBankTabID))
+    S.Utils.KillFrame(BankFrame.TabSystem:GetTabButton(BankFrame.accountBankTabID))
+    BankFrame.SetShown = BankFrame.Show
+    BankFrame.Hide = BankFrame.Show
+    BankFrame:Show()
+    BankFrame.TabSystem.LayoutChildren = function(self) return 1, 1, false end
+else
+    f.sideTabFrame = CreateFrame("FRAME", nil, f)
+end
 f.sideTabFrame:SetFrameLevel(f:GetFrameLevel() - 10)
 -- Create the tabs
 if S.WoWVersion() == 1 then
@@ -517,16 +517,10 @@ else
     SelectSideTab(nil)
     S.Utils.RunOnEvent(nil, "BankOpened", function()
         SelectSideTab("BANK", true)
-        if S.UseNewBank() then
-            BankFrame.BankPanel:Show()
-        end
     end)
 end
 S.Utils.RunOnEvent(nil, "BankClosed", function()
     SelectSideTab(nil, true)
-    if S.UseNewBank() then
-        BankFrame.BankPanel:Hide()
-    end
 end)
 
 function S.AddSideTab(text, key, button)

@@ -182,9 +182,11 @@ local function QueryItemCounts(i, itemID, GUIDs, tooltipID)
 
     local bankCount = 0
     for _, bag in pairs(S.Utils.ContainersOfType(S.CONTAINER_TYPES.BANK)) do
-        for _, itemData in pairs(data.containers[bag]) do
-            if itemData.itemID == itemID and itemData.count then
-                bagCount = bagCount + itemData.count
+        if data.containers[bag] then
+            for _, itemData in pairs(data.containers[bag]) do
+                if itemData.itemID == itemID and itemData.count then
+                    bagCount = bagCount + itemData.count
+                end
             end
         end
     end

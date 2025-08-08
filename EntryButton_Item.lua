@@ -203,11 +203,11 @@ local function ButtonScheduledUpdate(self)
     end
 end
 local function Button_OnUpdate(self)
-	S.Tooltip.Schedule(ButtonScheduledUpdate, self, true)
+	S.Tooltip.Schedule(self.UpdateTooltip, self, true)
 end
 local function Button_OnEnter(self)
 	S.Tooltip.Schedule(function() 
-        ButtonScheduledUpdate(self)
+        self:UpdateTooltip()
         
         if S.Settings.Get("tooltipInfo") == 1 then
             S.Tooltip.Extended(self.bag, self.slot)
@@ -299,7 +299,7 @@ function S.CreateItemEntry(list, template)
 
     -- Replace Blizz methods
     self.OnUpdate = Button_OnUpdate
-    self.button.UpdateTooltip = Button_OnUpdate
+    self.button.UpdateTooltip = ButtonScheduledUpdate
     self.button.OnItemEntryButtonEnter = Button_OnEnter
     if S.WoWVersion() <= 4 then 
         self.button.GetBagID = Button_GetBagID -- Replacing this in Retail seems to cause the "Sorted was blocked from an action only available to the Blizzard UI" error
