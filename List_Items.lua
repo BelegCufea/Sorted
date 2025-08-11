@@ -1710,13 +1710,13 @@ function S.CreateItemList(parent, type, minWidth, itemButtonTemplate)
     list:HookScript("OnShow", function(self)
         -- Update BankFrame.selectedTab so items will go into either the bank or reagent bank correctly
         if self.type == "BANK" then
-            if not S.UseNewBank() then
+            if S.UseNewBank() then
+                BankFrame.BankPanel:SetBankType(Enum.BankType.Character)
+            else
                 if BankFrameTab1 then
                     BankFrameTab1:Click()
                 end
                 BankFrame.selectedTab = 1
-            else
-                BankFrame.BankPanel:SetBankType(Enum.BankType.Character)
             end
             self:UpdateBankWarningMessage()
         elseif self.type == "REAGENT" then
@@ -1726,13 +1726,13 @@ function S.CreateItemList(parent, type, minWidth, itemButtonTemplate)
             BankFrame.selectedTab = 2
             self:UpdateReagentWarningMessage()
         elseif self.type == "ACCOUNT" then
-            if not S.UseNewBank() then
+            if S.UseNewBank() then
+                BankFrame.BankPanel:SetBankType(Enum.BankType.Account)
+            else
                 if BankFrameTab3 then
                     BankFrameTab3:Click()
                 end
                 BankFrame.selectedTab = 3
-            else
-                BankFrame.BankPanel:SetBankType(Enum.BankType.Account)
             end
         end
     end)

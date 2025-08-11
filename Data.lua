@@ -457,7 +457,7 @@ local function UpdateBagContents(container)
     if S.WoWVersion() >= 6 and not S.UseNewBank() and S.IsBankOpened() and IsReagentBankUnlocked() then
         GetData(playerGUID).reagentNotUnlocked = nil
         if not container or REAGENTBANK_CONTAINER == container then
-            for slotID = 1, 98 do
+            for slotID = 1, S.Utils.MaxBankSlots() do
                 S.Data.UpdateItem(REAGENTBANK_CONTAINER, slotID)
             end
         end
@@ -465,9 +465,9 @@ local function UpdateBagContents(container)
 
     -- Account bank
     if S.WoWVersion() >= 11 and S.IsBankOpened() and C_PlayerInfo.HasAccountInventoryLock() then
-        for k, bagID in pairs(S.Utils.ContainersOfType("ACCOUNT")) do 
+        for k, bagID in pairs(S.Utils.ContainersOfType("ACCOUNT")) do
             if not container or bagID == container then
-                for slotID = 1, 98 do
+                for slotID = 1, S.Utils.MaxBankSlots() do
                     S.Data.UpdateItem(bagID, slotID)
                 end
             end

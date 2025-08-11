@@ -244,8 +244,8 @@ if S.WoWVersion() >= 11 and S.UseNewBank() then
 
 
 
-    -- Hide controls when player isn't at a bank
     S.Utils.RunOnEvent(f, "BankOpened", function(self)
+        -- Hide controls when player isn't at a bank
         self.middleFrame:Show()
     end)
     S.Utils.RunOnEvent(f, "BankClosed", function(self)

@@ -94,6 +94,10 @@ end
 function S.Utils.MaxBankSlots()
     return MAX_BANK_SLOTS
 end
+local MAX_ACCOUNT_BANK_SLOTS = 98
+function S.Utils.MaxAccountBankSlots()
+    return MAX_ACCOUNT_BANK_SLOTS
+end
 
 
 -- Dealing with other bag frames
@@ -1054,13 +1058,18 @@ function S.Utils.ContainerIsType(container, type)
 end
 
 function S.Utils.GetContainerMaxSlots(container)
+    -- Old reagent bank
     if container == REAGENTBANK_CONTAINER then
         return 98
+    -- Post-11.2 bank
+    elseif S.UseNewBank() and container >= Enum.BagIndex.CharacterBankTab_1 and container <= Enum.BagIndex.CharacterBankTab_6 then
+        return S.Utils.MaxBankSlots()
+    -- Old bank
     elseif container == BANK_CONTAINER then
-        return 28
+        return S.Utils.MaxBankSlots()
      -- Account bank
-    elseif container >= 13 and container <= 17 then
-        return 98
+    elseif S.WoWVersion() >= 11 and container >= Enum.BagIndex.AccountBankTab_1 and container <= Enum.BagIndex.AccountBankTab_5 then
+        return S.Utils.MaxAccountBankSlots()
     else
         return S.Utils.MaxBagSlots()
     end

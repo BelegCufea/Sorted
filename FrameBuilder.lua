@@ -478,22 +478,7 @@ local function CreateSideTab(parent, text, key, itemList, button)
     return b
 end
 -- Create a point for the tabs to attach to. Move all the tabs by moving this one frame
--- if S.UseNewBank() then
---     -- Hijack the default bank frame tab system
---     f.sideTabFrame = BankFrame.TabSystem
---     BankFrame:SetParent(f)
---     S.Utils.KillFrame(BankFrame)
---     S.Utils.KillFrame(BankPanel)
---     S.Utils.KillFrame(BankFrame.TabSystem)
---     S.Utils.KillFrame(BankFrame.TabSystem:GetTabButton(BankFrame.characterBankTabID))
---     S.Utils.KillFrame(BankFrame.TabSystem:GetTabButton(BankFrame.accountBankTabID))
---     BankFrame.SetShown = BankFrame.Show
---     BankFrame.Hide = BankFrame.Show
---     BankFrame:Show()
---     BankFrame.TabSystem.LayoutChildren = function(self) return 1, 1, false end
--- else
 f.sideTabFrame = CreateFrame("FRAME", nil, f)
---end
 f.sideTabFrame:SetFrameLevel(f:GetFrameLevel() - 10)
 -- Create the tabs
 if S.WoWVersion() == 1 then
@@ -516,17 +501,19 @@ else
     end
     SelectSideTab(nil)
     S.Utils.RunOnEvent(nil, "BankOpened", function()
-        SelectSideTab("BANK", true)
         if S.UseNewBank() then
+            -- Make items go into the bank when right-clicked
             BankFrame.BankPanel:Show()
         end
+        SelectSideTab("BANK", true)
     end)
 end
 S.Utils.RunOnEvent(nil, "BankClosed", function()
-    SelectSideTab(nil, true)
     if S.UseNewBank() then
+        -- Make items go into the bank when right-clicked
         BankFrame.BankPanel:Hide()
     end
+    SelectSideTab(nil, true)
 end)
 
 function S.AddSideTab(text, key, button)
