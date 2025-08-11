@@ -1716,7 +1716,7 @@ function S.CreateItemList(parent, type, minWidth, itemButtonTemplate)
                 end
                 BankFrame.selectedTab = 1
             else
-                BankFrame.BankPanel.bankType = Enum.BankType.Character
+                BankFrame.BankPanel:SetBankType(Enum.BankType.Character)
             end
             self:UpdateBankWarningMessage()
         elseif self.type == "REAGENT" then
@@ -1732,7 +1732,7 @@ function S.CreateItemList(parent, type, minWidth, itemButtonTemplate)
                 end
                 BankFrame.selectedTab = 3
             else
-                BankFrame.BankPanel.bankType = Enum.BankType.Account
+                BankFrame.BankPanel:SetBankType(Enum.BankType.Account)
             end
         end
     end)
