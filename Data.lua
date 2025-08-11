@@ -467,7 +467,7 @@ local function UpdateBagContents(container)
     if S.WoWVersion() >= 11 and S.IsBankOpened() and C_PlayerInfo.HasAccountInventoryLock() then
         for k, bagID in pairs(S.Utils.ContainersOfType("ACCOUNT")) do
             if not container or bagID == container then
-                for slotID = 1, S.Utils.MaxBankSlots() do
+                for slotID = 1, S.Utils.MaxAccountBankSlots() do
                     S.Data.UpdateItem(bagID, slotID)
                 end
             end
