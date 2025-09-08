@@ -1089,6 +1089,10 @@ local function DelayedFilter(self)
                 if selectedTab and selectedTab ~= entry.data.bag - Enum.BagIndex.AccountBankTab_1 + 1 then
                     entry.filtered = true
                 end
+            elseif S.UseNewBank() and BankFrame.BankPanel:IsShown() and BankFrame.BankPanel:GetActiveBankType() == Enum.BankType.Account then
+                if entry.data and (entry.data.bindType ~= 0 and not entry.data.accountBound) then
+                    entry.filtered = true
+                end
             end
 
             if learnable then
@@ -1735,6 +1739,8 @@ function S.CreateItemList(parent, type, minWidth, itemButtonTemplate)
                 BankFrame.selectedTab = 3
             end
         end
+        DelayedFilter(S.primaryItemList)
+        S.primaryItemList:ScheduleUpdate(false, true)
     end)
 
 
