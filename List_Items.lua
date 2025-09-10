@@ -1089,8 +1089,8 @@ local function DelayedFilter(self)
                 if selectedTab and selectedTab ~= entry.data.bag - Enum.BagIndex.AccountBankTab_1 + 1 then
                     entry.filtered = true
                 end
-            elseif S.UseNewBank() and BankFrame.BankPanel:IsShown() and BankFrame.BankPanel:GetActiveBankType() == Enum.BankType.Account then
-                if entry.data and (entry.data.bindType ~= 0 and not entry.data.accountBound) then
+            elseif self.type == "BAGS" and S.UseNewBank() and BankFrame.BankPanel:IsShown() and BankFrame.BankPanel:GetActiveBankType() == Enum.BankType.Account then
+                if entry.data and not entry.data.accountBound then
                     entry.filtered = true
                 end
             end
