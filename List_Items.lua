@@ -1732,6 +1732,7 @@ function S.CreateItemList(parent, type, minWidth, itemButtonTemplate)
         elseif self.type == "ACCOUNT" then
             if S.UseNewBank() then
                 BankFrame.BankPanel:SetBankType(Enum.BankType.Account)
+                S.primaryItemList:ScrollToTop()
             else
                 if BankFrameTab3 then
                     BankFrameTab3:Click()
