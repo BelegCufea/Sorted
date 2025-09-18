@@ -499,7 +499,7 @@ function S.Utils.BasicTextSearchAnyWord(search, text)
 end
 -- Makes lowercase, no punctuation, no whitespace
 local function StripString(s)
-    return s:lower():gsub("[%s%p]", "")
+    return (s or ""):lower():gsub("[%s%p]", "")
 end
 -- Returns true if 'text' contains the entire string 'search' (after stripping)
 function S.Utils.BasicTextSearchFullString(search, text)
