@@ -1090,7 +1090,7 @@ local function DelayedFilter(self)
                     entry.filtered = true
                 end
             elseif self.type == "BAGS" and S.UseNewBank() and BankFrame.BankPanel:IsShown() and BankFrame.BankPanel:GetActiveBankType() == Enum.BankType.Account then
-                if entry.data and not entry.data.accountBound then
+                if entry.data and (not entry.data.accountBound or entry.data.bound) then
                     entry.filtered = true
                 end
             end
