@@ -41,6 +41,9 @@ function S.API.DefaultItemSort(itemData1, itemData2)
             end
             return itemData1.name < itemData2.name
         end
+        if itemData1.effectiveILvl == nil or itemData2.effectiveILvl == nil then
+            return false
+        end
         return itemData1.effectiveILvl > itemData2.effectiveILvl
     end
     return itemData1.quality > itemData2.quality
@@ -97,7 +100,7 @@ end
             ["tinted"] = ColorMixin. Grayed out color1 for filtering.
         }
 
-    UpdateIcon(self, iconSize, borderThickness, iconShape) - Optional 
+    UpdateIcon(self, iconSize, borderThickness, iconShape) - Optional
         If the element is an icon, consider using this to apply skinning settings
         Parameters:
         self - FRAME - The frame created by CreateElement.
@@ -134,7 +137,7 @@ end
         asc - BOOLEAN - Whether the user has sorted by ascending
         itemData1 - TABLE - Data table of the first item
         itemData2 - TABLE - Data table of the second item
-    
+
     inverse - BOOLEAN - Optional - Set to true if sorting should start ascending instead of descending.
 ]]
 function S.API:AddSortMethod(columnKey, title, Sort, inverse)
@@ -164,7 +167,7 @@ end
 
 --[[
 
--- EXAMPLE 
+-- EXAMPLE
 -- Remove the double square brackets, before and after, to test.
 
 local Sorted = LibStub("Sorted.")

@@ -45,7 +45,7 @@ end
 }]]
 -- Moved to Settings
 
---[[ 
+--[[
     Item bindings
 ____________________________
 1: Bind on Equip
@@ -266,15 +266,15 @@ S.ItemColumns = {
                 x = 0
                 y = 0
                 self.favoriteButton:GetHighlightTexture():SetTexCoord(
-                    x * favoriteButtonTexSize, 
+                    x * favoriteButtonTexSize,
                     (x+1) * favoriteButtonTexSize,
-                    y * favoriteButtonTexSize, 
+                    y * favoriteButtonTexSize,
                     (y+1) * favoriteButtonTexSize
                 )
                 self.favoriteButton:GetPushedTexture():SetTexCoord(
-                    x * favoriteButtonTexSize, 
+                    x * favoriteButtonTexSize,
                     (x+1) * favoriteButtonTexSize,
-                    y * favoriteButtonTexSize, 
+                    y * favoriteButtonTexSize,
                     (y+1) * favoriteButtonTexSize
                 )
                 if self.mouseEntered then
@@ -285,21 +285,21 @@ S.ItemColumns = {
             else
                 x,y = (favorited - 1) % 4, floor((favorited - 1) / 4)
                 self.favoriteButton:GetNormalTexture():SetTexCoord(
-                    x * favoriteButtonTexSize, 
+                    x * favoriteButtonTexSize,
                     (x+1) * favoriteButtonTexSize,
-                    y * favoriteButtonTexSize, 
+                    y * favoriteButtonTexSize,
                     (y+1) * favoriteButtonTexSize
                 )
                 self.favoriteButton:GetHighlightTexture():SetTexCoord(
-                    x * favoriteButtonTexSize, 
+                    x * favoriteButtonTexSize,
                     (x+1) * favoriteButtonTexSize,
-                    y * favoriteButtonTexSize, 
+                    y * favoriteButtonTexSize,
                     (y+1) * favoriteButtonTexSize
                 )
                 self.favoriteButton:GetPushedTexture():SetTexCoord(
-                    x * favoriteButtonTexSize, 
+                    x * favoriteButtonTexSize,
                     (x+1) * favoriteButtonTexSize,
-                    y * favoriteButtonTexSize, 
+                    y * favoriteButtonTexSize,
                     (y+1) * favoriteButtonTexSize
                 )
                 self.favoriteButton.backdrop:SetTexCoord(1,1,1,1)
@@ -332,7 +332,7 @@ S.ItemColumns = {
             f.quantityString:SetTextColor(S.Color.YELLOWISH_TEXT:GetRGB())
         end,
         ["UpdateElement"] = function(self, data)
-            if data.combinedCount <= 1 then
+            if not data or data.combinedCount == nil or data.combinedCount <= 1 then
                 self.quantityString:SetText("")
             else
                 self.quantityString:SetText(data.combinedCount)
@@ -377,7 +377,7 @@ S.ItemColumns = {
         ["sortMethods"] = {
             {
                 ["title"] = "",
-                ["func"] = function(asc, slot1, slot2) 
+                ["func"] = function(asc, slot1, slot2)
                     return S.Sort.ByKey(not asc, slot1, slot2, "quality")
                 end
             }
@@ -430,7 +430,7 @@ S.ItemColumns = {
         ["sortMethods"] = {
             {
                 ["title"] = S.Localize("COLUMN_RARITY_SHORT"),
-                ["func"] = function(asc, slot1, slot2) 
+                ["func"] = function(asc, slot1, slot2)
                     local sort = S.Sort.ByKey(not asc, slot1, slot2, "quality")
                     if sort == 0 then
                         return S.Sort.ByKey(not asc, slot1, slot2, "effectiveILvl")
@@ -440,7 +440,7 @@ S.ItemColumns = {
             },
             {
                 ["title"] = S.Localize("COLUMN_NAME_SHORT"),
-                ["func"] = function(asc, slot1, slot2) 
+                ["func"] = function(asc, slot1, slot2)
                     return S.Sort.ByKey(asc, slot1, slot2, "name")
                 end,
                 ["inverse"] = true
@@ -538,7 +538,7 @@ S.ItemColumns = {
         ["sortMethods"] = {
             {
                 ["title"] = S.Localize("COLUMN_ITEM_LEVEL_SHORT"),
-                ["func"] = function(asc, slot1, slot2) 
+                ["func"] = function(asc, slot1, slot2)
                     return S.Sort.ByKey(not asc, slot1, slot2, "effectiveILvl")
                 end
             }
@@ -560,8 +560,8 @@ S.ItemColumns = {
 
             -- Everything else
             else
-                if S.IsPlayingCharacterSelected() and data.effectiveILvl and data.effectiveILvl > S.maxILvl then 
-                    S.maxILvl = data.effectiveILvl 
+                if S.IsPlayingCharacterSelected() and data.effectiveILvl and data.effectiveILvl > S.maxILvl then
+                    S.maxILvl = data.effectiveILvl
                 end
                 if (data.effectiveILvl and data.effectiveILvl > 1) then
                     self.lvlString:SetText(data.effectiveILvl)
@@ -680,7 +680,7 @@ S.ItemColumns = {
         ["UpdateElement"] = function(self, data)
 
             self.subtypeString:SetText(GetItemSubClassInfo(data.classID, data.subClassID))
-            
+
             if data.filtered then
                 self.subtypeString:SetTextColor(S.Color.GREY:GetRGB())
             else
@@ -834,7 +834,7 @@ S.ItemColumns = {
                     if binding1 == 4 then binding1 = 1 end -- Treat quest items as BoP
                     if not slot1.bound then binding1 = binding1 + 4 end
                     if slot1.accountBound then binding1 = binding1 + 8 end
-                    
+
                     local binding2 = slot2.bindType
                     if binding2 == 4 then binding2 = 1 end -- Treat quest items as BoP
                     if not slot2.bound then binding2 = binding2 + 4 end
@@ -856,7 +856,7 @@ S.ItemColumns = {
 
                 local y
                 if data.bound then y = 0 else y = 0.5 end
-                
+
                 if data.accountBound then
                     if data.bindType == 1 then   -- Warbound
                         x = 0.75
@@ -893,7 +893,7 @@ S.ItemColumns = {
         ["sortMethods"] = {
             {
                 ["title"] = S.Localize("COLUMN_SELL_PRICE_SHORT"),
-                ["func"] = function(asc, slot1, slot2) 
+                ["func"] = function(asc, slot1, slot2)
                     local value1 = slot1.value * slot1.count
                     local value2 = slot2.value * slot2.count
                     if slot1.hasNoValue then value1 = nil end
@@ -1365,7 +1365,7 @@ local function OnUpdate3(self)
         self:UpdateContainerButtons()
 
         self.updateScheduled = false
-        
+
         lastUpdateTime = GetTime()
     end
 end
@@ -1461,7 +1461,7 @@ function S.ListItemsMixin:AddContainerButton(containerID, gray)
             GameTooltip:Show()
         end
     end
-    
+
     b:SetScript("OnEnter", function(self)
         if self.list:IsAvailable() then
             self:UpdateTooltip()
@@ -1573,7 +1573,7 @@ function S.CreateItemList(parent, type, minWidth, itemButtonTemplate)
 
     list.UpdateEntryButtonsSuper = list.UpdateEntryButtons
     Mixin(list, S.ListItemsMixin)
-    
+
     --[[if type == "BAGS" then
         list.itemButtonTemplate = "SecureActionButtonTemplate"
     else]]
@@ -1596,7 +1596,7 @@ function S.CreateItemList(parent, type, minWidth, itemButtonTemplate)
         table.insert(list.containers, bag)
         for slot = 1, S.Utils.GetContainerMaxSlots(bag) do
             list:AddEntry({
-                ["bag"] = bag, 
+                ["bag"] = bag,
                 ["slot"] = slot
             })
         end
@@ -1768,7 +1768,7 @@ function S.CreateItemList(parent, type, minWidth, itemButtonTemplate)
         S.Utils.PlaceCursorItemInContainerType(self.list.type)
     end)
 
-    
+
     list.freeSpace = CreateFrame("BUTTON", nil, list)
     list.freeSpace:SetPoint("TOPLEFT", list, "BOTTOMLEFT")
     list.freeSpace:SetSize(70, 32)
