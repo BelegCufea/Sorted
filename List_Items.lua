@@ -850,7 +850,7 @@ S.ItemColumns = {
             f.bindIcon:SetPoint("CENTER")
         end,
         ["UpdateElement"] = function(self, data)
-            if data.bindType > 0 then
+            if (data.bindType or 0) > 0 then
                 if data.bindType == 4 then data.bindType = 1 end -- Treat quest items as BoP
                 local x = (data.bindType - 1) / 4
 
